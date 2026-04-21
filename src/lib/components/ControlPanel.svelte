@@ -12,7 +12,8 @@
 		hasMatrix = false
 	} = $props();
 
-	const gridSizes = [3, 4, 5];
+	// const gridSizes = [3, 4, 5];
+	const gridSizes = [3];
 	const difficulties = [
 		{ key: 'easy', label: 'Easy', max: 1 },
 		{ key: 'medium', label: 'Medium', max: 2 },
