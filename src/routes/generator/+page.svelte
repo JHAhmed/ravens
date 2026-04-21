@@ -1,5 +1,6 @@
 <script>
 	import ControlPanel from '$lib/components/ControlPanel.svelte';
+	import RulesPanel from '$lib/components/RulesPanel.svelte';
 	import MatrixGrid from '$lib/components/MatrixGrid.svelte';
 	import AnswerOptions from '$lib/components/AnswerOptions.svelte';
 	import { generateMatrix, matrixToSVG } from '$lib/engine/generator.js';
@@ -9,6 +10,8 @@
 	let difficulty = $state('easy');
 	let selectedRules = $state([]);
 	let matrix = $state(null);
+
+	const maxRules = $derived(difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3);
 
 	function generate() {
 		if (selectedRules.length === 0) return;
@@ -22,7 +25,7 @@
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
-		a.download = `ravens-${gridSize}x${gridSize}.svg`;
+		a.download = `raywhen-${gridSize}x${gridSize}.svg`;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
@@ -30,9 +33,6 @@
 	}
 
 	function randomize() {
-		const maxRules = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3;
-
-		// pick random compatible rules
 		const available = ALL_RULES.filter((r) => r.gridSizes.includes(gridSize));
 		const picked = [];
 		const shuffled = [...available].sort(() => Math.random() - 0.5);
@@ -53,17 +53,17 @@
 </script>
 
 <svelte:head>
-	<title>Generator | Ravens</title>
+	<title>Generator | Raywhen</title>
 	<meta
 		name="description"
 		content="Generate custom Raven's Progressive Matrices with configurable rules, grid sizes, and difficulty levels."
 	/>
 </svelte:head>
 
-<section class="min-h-dvh w-full bg-white">
+<section class="flex h-dvh w-full flex-col overflow-hidden bg-white">
 	<!-- Header -->
-	<header class="border-b border-gray-100 px-6 py-4 md:px-10">
-		<div class="mx-auto flex max-w-6xl items-center justify-between">
+	<header class="shrink-0 border-b border-gray-100 px-4 py-3 md:px-8">
+		<div class="mx-auto flex max-w-7xl items-center justify-between">
 			<a
 				href="/"
 				class="flex items-center gap-2 text-sm font-medium text-gray-400 transition-colors duration-150 hover:text-black"
@@ -79,14 +79,16 @@
 				</svg>
 				Back
 			</a>
-			<h1 class="text-sm font-semibold tracking-tight md:text-base">Ravens Generator</h1>
+			<h1 class="text-sm font-semibold tracking-tight md:text-base">Raywhen Generator</h1>
 			<div class="w-14"></div>
 		</div>
 	</header>
 
-	<!-- Main content -->
-	<main class="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-8 md:px-10 lg:flex-row lg:gap-12">
-		<!-- Control Panel (left on desktop, top on mobile) -->
+	<!-- Main: 3-column on desktop (controls | matrix | rules) -->
+	<main
+		class="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-4 overflow-y-auto px-4 py-4 md:px-8 lg:flex-row lg:gap-6 lg:overflow-hidden"
+	>
+		<!-- LEFT: Config + Buttons -->
 		<ControlPanel
 			bind:gridSize
 			bind:difficulty
@@ -97,10 +99,10 @@
 			hasMatrix={matrix !== null}
 		/>
 
-		<!-- Matrix area -->
-		<div class="flex flex-1 flex-col items-center justify-start gap-4">
+		<!-- CENTER: Matrix + Answers -->
+		<div class="flex min-h-0 flex-1 flex-col items-center justify-start gap-3 lg:overflow-y-auto">
 			{#if matrix}
-				<div class="w-full rounded-2xl border border-gray-100 bg-gray-50 p-6 md:p-10">
+				<div class="w-full max-w-lg rounded-2xl border border-gray-100 bg-gray-50 p-4 md:p-6">
 					<MatrixGrid grid={matrix.grid} {gridSize} />
 				</div>
 
@@ -114,7 +116,7 @@
 			{:else}
 				<!-- Empty state -->
 				<div
-					class="flex aspect-square w-full max-w-md flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 p-8"
+					class="flex aspect-square w-full max-w-sm flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 p-8"
 				>
 					<svg
 						class="mb-4 h-12 w-12 text-gray-300"
@@ -126,14 +128,7 @@
 						<rect x="3" y="3" width="7" height="7" rx="1" />
 						<rect x="14" y="3" width="7" height="7" rx="1" />
 						<rect x="3" y="14" width="7" height="7" rx="1" />
-						<rect
-							x="14"
-							y="14"
-							width="7"
-							height="7"
-							rx="1"
-							stroke-dasharray="3,2"
-						/>
+						<rect x="14" y="14" width="7" height="7" rx="1" stroke-dasharray="3,2" />
 					</svg>
 					<p class="text-center text-sm font-medium text-gray-400">
 						Select rules and hit <span class="font-semibold text-gray-600">Generate</span> or
@@ -142,5 +137,8 @@
 				</div>
 			{/if}
 		</div>
+
+		<!-- RIGHT: Rules -->
+		<RulesPanel {gridSize} bind:selectedRules {maxRules} />
 	</main>
 </section>

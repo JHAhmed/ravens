@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "ravens",
+      "name": "raywhen",
       "devDependencies": {
         "@sveltejs/adapter-vercel": "^6.3.3",
         "@sveltejs/kit": "^2.57.0",
