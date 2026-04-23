@@ -5,7 +5,7 @@
 </script>
 
 <div
-	class="mx-auto grid w-full"
+	class="mx-auto grid w-full gap-[2px]"
 	style="grid-template-columns: repeat({gridSize}, 1fr); max-width: min(90vw, {gridSize * 120}px);"
 >
 	{#each grid as row, r}

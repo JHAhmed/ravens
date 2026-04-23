@@ -3,10 +3,11 @@
  * (5 easy, 5 medium, 5 hard) from a numeric seed.
  *
  * Uses seeded randomness so the same seed always yields the same test.
+ * Supports mixed-symbol rows for medium/hard questions.
  */
 
-import { ALL_RULES, areRulesCompatible } from './rules.js';
-import { SHAPE_TYPES, FILL_TYPES, SIZE_MAP } from './shapes.js';
+import { ALL_RULES, areRulesCompatible, getElementPositions } from './rules.js';
+import { SHAPE_TYPES, FILL_TYPES, ROTATION_SAFE_SHAPES, SIZE_MAP } from './shapes.js';
 import { createRng, seededShuffle, seededChoice, seededInt } from './seededRandom.js';
 
 // ── Seeded helpers (mirror generator.js helpers but using rng) ───────
@@ -28,7 +29,7 @@ const STRUCTURAL_IDS = new Set([
 function createDefaultGridSeeded(gridSize, selectedRuleIds, rng) {
 	let availableShapes = [...SHAPE_TYPES];
 	if (selectedRuleIds.includes('rotation')) {
-		availableShapes = availableShapes.filter((s) => s !== 'circle');
+		availableShapes = availableShapes.filter((s) => ROTATION_SAFE_SHAPES.includes(s));
 	}
 	const shapes = seededShuffle(availableShapes, rng).slice(0, gridSize);
 	const fills = seededShuffle([...FILL_TYPES], rng);
@@ -47,6 +48,49 @@ function createDefaultGridSeeded(gridSize, selectedRuleIds, rng) {
 	);
 }
 
+function createMixedGridSeeded(gridSize, selectedRuleIds, rng) {
+	let availableShapes = [...SHAPE_TYPES];
+	if (selectedRuleIds.includes('rotation')) {
+		availableShapes = availableShapes.filter((s) => ROTATION_SAFE_SHAPES.includes(s));
+	}
+
+	const shuffled = seededShuffle(availableShapes, rng);
+	const fills = seededShuffle([...FILL_TYPES], rng);
+	const positions = getElementPositions(2);
+
+	return Array.from({ length: gridSize }, (_, r) => {
+		const shape1 = shuffled[r % shuffled.length];
+		const shape2 = shuffled[(r + 1) % shuffled.length];
+		const finalShape2 = shape2 === shape1
+			? shuffled[(r + 2) % shuffled.length] || 'star'
+			: shape2;
+
+		return Array.from({ length: gridSize }, () => [
+			{
+				shape: shape1,
+				fill: fills[r % fills.length],
+				size: 'medium',
+				rotation: 0,
+				x: positions[0].x,
+				y: positions[0].y
+			},
+			{
+				shape: finalShape2,
+				fill: fills[(r + 1) % fills.length],
+				size: 'medium',
+				rotation: 0,
+				x: positions[1].x,
+				y: positions[1].y
+			}
+		]);
+	});
+}
+
+function shouldUseMixedGrid(rules) {
+	const attribute = rules.filter((r) => !STRUCTURAL_IDS.has(r.id));
+	return attribute.length >= 2;
+}
+
 // ── Seeded distractor generation ─────────────────────────────────────
 
 function createDistractorsSeeded(answer, grid, gridSize, rng) {
@@ -60,7 +104,57 @@ function createDistractorsSeeded(answer, grid, gridSize, rng) {
 		}
 	};
 
-	if (answer.length > 0) {
+	const isMixed = answer.length >= 2;
+
+	if (isMixed) {
+		// Type 1: Swap rule effects between elements
+		const d1 = deepClone(answer);
+		const tmpSize = d1[0].size;
+		const tmpRot = d1[0].rotation;
+		d1[0].size = d1[1].size;
+		d1[0].rotation = d1[1].rotation;
+		d1[1].size = tmpSize;
+		d1[1].rotation = tmpRot;
+		tryPush(d1);
+
+		// Type 2: Wrong step in progression for element 0
+		const d2 = deepClone(answer);
+		const sizes = ['small', 'medium', 'large'];
+		const curSizeIdx = sizes.indexOf(d2[0].size);
+		d2[0].size = sizes[(curSizeIdx + 1) % sizes.length];
+		tryPush(d2);
+
+		// Type 3: Wrong rotation for element 1
+		const d3 = deepClone(answer);
+		d3[1].rotation = (d3[1].rotation + 45) % 360;
+		tryPush(d3);
+
+		// Type 4: Wrong shape for element 0
+		const d4 = deepClone(answer);
+		const otherShapes0 = SHAPE_TYPES.filter((s) => s !== answer[0].shape);
+		d4[0].shape = seededChoice(otherShapes0, rng);
+		tryPush(d4);
+
+		// Type 5: Wrong fill for element 1
+		const d5 = deepClone(answer);
+		const otherFills1 = FILL_TYPES.filter((f) => f !== answer[1].fill);
+		d5[1].fill = seededChoice(otherFills1, rng);
+		tryPush(d5);
+
+		// Type 6: Both elements have wrong size
+		const d6 = deepClone(answer);
+		for (const el of d6) {
+			const idx = sizes.indexOf(el.size);
+			el.size = sizes[Math.max(0, idx - 1)];
+		}
+		tryPush(d6);
+
+		// Type 7: Element 0 gets element 1's shape
+		const d7 = deepClone(answer);
+		d7[0].shape = d7[1].shape;
+		tryPush(d7);
+
+	} else if (answer.length > 0) {
 		const d1 = deepClone(answer);
 		const otherShapes = SHAPE_TYPES.filter((s) => s !== answer[0].shape);
 		d1[0].shape = seededChoice(otherShapes, rng);
@@ -128,6 +222,8 @@ function generateMatrixSeeded(gridSize, selectedRuleIds, rng) {
 	const priority = { shape: 0, fill: 1, size: 2, rotation: 3, position: 4 };
 	attribute.sort((a, b) => (priority[a.modifies] ?? 99) - (priority[b.modifies] ?? 99));
 
+	const useMixed = structural.length === 0 && shouldUseMixedGrid(rules);
+
 	// Temporarily replace Math.random with our seeded version
 	const originalRandom = Math.random;
 	Math.random = rng;
@@ -137,12 +233,22 @@ function generateMatrixSeeded(gridSize, selectedRuleIds, rng) {
 		if (structural.length > 0) {
 			grid = createDefaultGridSeeded(gridSize, selectedRuleIds, rng);
 			structural[0].apply(grid, gridSize);
+		} else if (useMixed) {
+			grid = createMixedGridSeeded(gridSize, selectedRuleIds, rng);
 		} else {
 			grid = createDefaultGridSeeded(gridSize, selectedRuleIds, rng);
 		}
 
-		for (const rule of attribute) {
-			rule.apply(grid, gridSize);
+		if (useMixed && attribute.length >= 2) {
+			attribute[0].apply(grid, gridSize, 0);
+			attribute[1].apply(grid, gridSize, 1);
+			for (let i = 2; i < attribute.length; i++) {
+				attribute[i].apply(grid, gridSize);
+			}
+		} else {
+			for (const rule of attribute) {
+				rule.apply(grid, gridSize);
+			}
 		}
 	} finally {
 		Math.random = originalRandom;

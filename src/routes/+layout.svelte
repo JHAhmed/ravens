@@ -15,4 +15,4 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div class="selection:bg-slate-300">{@render children()}</div>
+<div>{@render children()}</div>

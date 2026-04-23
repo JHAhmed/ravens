@@ -22,7 +22,7 @@
 			height="8"
 			patternTransform="rotate(45)"
 		>
-			<rect width="3" height="8" fill="black" />
+			<rect width="3" height="8" fill="white" />
 		</pattern>
 	</defs>
 
@@ -31,7 +31,7 @@
 		{@const cy = el.y * 100}
 		{@const radius = SIZE_MAP[el.size] || SIZE_MAP.medium}
 		{@const fill = getFillValue(el.fill, patternId)}
-		{@const stroke = '#000000'}
+		{@const stroke = '#ffffff'}
 		{@const sw = getStrokeWidth(el.fill)}
 		{@const rot = el.rotation || 0}
 

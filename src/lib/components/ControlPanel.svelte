@@ -53,15 +53,17 @@
 <aside class="flex w-full flex-col gap-5 lg:w-48">
 	<!-- Grid Size -->
 	<div>
-		<h3 class="mb-2 text-xs font-semibold tracking-widest text-gray-400 uppercase">Grid Size</h3>
+		<h3 class="mb-2 font-mono text-[10px] font-medium tracking-[1.8px] text-text-secondary uppercase">
+			GRID SIZE
+		</h3>
 		<div class="flex gap-1.5">
 			{#each gridSizes as gs}
 				<button
 					onclick={() => (gridSize = gs)}
-					class="cursor-pointer rounded-full border-2 px-4 py-1.5 text-sm font-medium tracking-tight transition-all duration-200
+					class="cursor-pointer rounded-3xl border px-4 py-1.5 font-mono text-xs font-medium tracking-wider transition-all duration-[150ms]
 						{gridSize === gs
-						? 'border-black bg-black text-white'
-						: 'border-gray-300 bg-white text-gray-700 hover:border-black'}"
+						? 'border-mint bg-mint text-text-inverted'
+						: 'border-hazard-white/30 bg-transparent text-text-muted hover:border-mint hover:text-mint'}"
 				>
 					{gs}×{gs}
 				</button>
@@ -71,36 +73,38 @@
 
 	<!-- Difficulty -->
 	<div>
-		<h3 class="mb-2 text-xs font-semibold tracking-widest text-gray-400 uppercase">Difficulty</h3>
+		<h3 class="mb-2 font-mono text-[10px] font-medium tracking-[1.8px] text-text-secondary uppercase">
+			DIFFICULTY
+		</h3>
 		<div class="flex flex-wrap gap-1.5">
 			{#each difficulties as d}
 				<button
 					onclick={() => (difficulty = d.key)}
-					class="cursor-pointer rounded-full border-2 px-3 py-1.5 text-sm font-medium tracking-tight transition-all duration-200
+					class="cursor-pointer rounded-3xl border px-3 py-1.5 font-mono text-xs font-medium tracking-wider transition-all duration-[150ms]
 						{difficulty === d.key
-						? 'border-black bg-black text-white'
-						: 'border-gray-300 bg-white text-gray-700 hover:border-black'}"
+						? 'border-mint bg-mint text-text-inverted'
+						: 'border-hazard-white/30 bg-transparent text-text-muted hover:border-mint hover:text-mint'}"
 				>
 					{d.label}
 				</button>
 			{/each}
 		</div>
-		<p class="mt-1.5 text-xs text-gray-400">Up to {maxRules} rule{maxRules > 1 ? 's' : ''}</p>
+		<p class="mt-1.5 text-xs text-text-secondary">Up to {maxRules} rule{maxRules > 1 ? 's' : ''}</p>
 	</div>
 
 	<!-- Actions -->
 	<div class="flex flex-col gap-2">
 		<Button
-			text="⟳  Randomize"
+			text="⟳  RANDOMIZE"
 			onclick={onRandom}
 		/>
 		<Button
-			text="Generate"
+			text="GENERATE"
 			onclick={onGenerate}
 			disabled={selectedRules.length === 0}
 		/>
 		{#if hasMatrix}
-			<Button text="↓  Download SVG" onclick={onDownload} />
+			<Button text="↓  DOWNLOAD SVG" onclick={onDownload} variant="secondary" />
 		{/if}
 	</div>
 </aside>

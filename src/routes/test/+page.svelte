@@ -12,6 +12,8 @@
 	let name = $state('');
 	let phone = $state('');
 	let seed = $state(randomSeed());
+	let showSeedInput = $state(false);
+	let customSeedValue = $state('');
 
 	// ── Test state ───────────────────────────────────────────────────
 	let test = $state(null);
@@ -42,13 +44,13 @@
 		if (!currentQuestion) return '';
 		switch (currentQuestion.difficulty) {
 			case 'easy':
-				return 'bg-emerald-100 text-emerald-700';
+				return 'bg-mint/20 text-mint';
 			case 'medium':
-				return 'bg-amber-100 text-amber-700';
+				return 'bg-ultraviolet/20 text-[#a78bfa]';
 			case 'hard':
-				return 'bg-red-100 text-red-700';
+				return 'bg-hazard-white/10 text-hazard-white';
 			default:
-				return 'bg-gray-100 text-gray-700';
+				return 'bg-surface text-text-secondary';
 		}
 	});
 
@@ -132,6 +134,8 @@
 		submitted = false;
 		answers = [];
 		elapsed = 0;
+		showSeedInput = false;
+		customSeedValue = '';
 		if (timerInterval) clearInterval(timerInterval);
 	}
 
@@ -140,6 +144,27 @@
 		const cleaned = e.target.value.replace(/\D/g, '').slice(0, 14);
 		phone = cleaned;
 		e.target.value = cleaned;
+	}
+
+	function toggleSeedInput() {
+		showSeedInput = !showSeedInput;
+		if (showSeedInput) {
+			customSeedValue = String(seed);
+		}
+	}
+
+	function handleSeedInput(e) {
+		const cleaned = e.target.value.replace(/\D/g, '').slice(0, 10);
+		customSeedValue = cleaned;
+		e.target.value = cleaned;
+		if (cleaned) {
+			seed = parseInt(cleaned, 10);
+		}
+	}
+
+	function regenerateSeed() {
+		seed = randomSeed();
+		customSeedValue = String(seed);
 	}
 </script>
 
@@ -157,31 +182,35 @@
 <!-- PHASE: FORM                                                        -->
 <!-- ═══════════════════════════════════════════════════════════════════ -->
 {#if phase === 'form'}
-	<section class="flex h-dvh w-full items-center justify-center bg-white p-6">
+	<section class="flex h-dvh w-full items-center justify-center bg-canvas p-6">
 		<div class="w-full max-w-md">
 			<!-- Back link -->
 			<a
 				href="/"
-				class="mb-8 inline-flex items-center gap-1.5 text-sm font-medium text-gray-400 transition-colors hover:text-black"
+				class="mb-8 inline-flex items-center gap-1.5 font-mono text-[11px] font-medium tracking-[1.1px] text-text-secondary uppercase transition-colors hover:text-mint"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
 					<path fill="currentColor" d="m14 18l-6-6l6-6l1.4 1.45L10.85 12l4.55 4.55z" />
 				</svg>
-				Back
+				BACK
 			</a>
 
-			<div class="rounded-2xl border border-gray-100 bg-gray-50 p-8 md:p-10">
-				<h1 class="mb-1 text-xl font-semibold tracking-tight md:text-2xl">Raywhen Test</h1>
-				<p class="mb-8 text-sm text-gray-500">15 questions · 5 Easy · 5 Medium · 5 Hard</p>
+			<div class="rounded-[20px] border border-hazard-white/10 bg-surface p-8 md:p-10">
+				<h1 class="mb-1 font-display text-3xl leading-[0.95] tracking-[1px] text-hazard-white uppercase md:text-4xl">
+					Raywhen Test
+				</h1>
+				<p class="mb-8 font-mono text-[11px] tracking-[1.1px] text-text-secondary uppercase">
+					15 QUESTIONS · 5 EASY · 5 MEDIUM · 5 HARD
+				</p>
 
 				<div class="flex flex-col gap-5">
 					<!-- Name -->
 					<div>
 						<label
 							for="test-name"
-							class="mb-1.5 block text-xs font-semibold tracking-widest text-gray-400 uppercase"
+							class="mb-1.5 block font-mono text-[10px] font-medium tracking-[1.8px] text-text-secondary uppercase"
 						>
-							Name
+							NAME
 						</label>
 						<input
 							id="test-name"
@@ -189,7 +218,7 @@
 							bind:value={name}
 							placeholder="Enter your name"
 							maxlength="64"
-							class="block w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-black focus:ring-0 focus:outline-none"
+							class="block w-full rounded-[2px] border border-hazard-white/30 bg-canvas px-4 py-2.5 text-sm text-text-primary placeholder-text-secondary transition-colors duration-150 focus:border-mint focus:ring-0 focus:outline-none"
 						/>
 					</div>
 
@@ -197,9 +226,9 @@
 					<div>
 						<label
 							for="test-phone"
-							class="mb-1.5 block text-xs font-semibold tracking-widest text-gray-400 uppercase"
+							class="mb-1.5 block font-mono text-[10px] font-medium tracking-[1.8px] text-text-secondary uppercase"
 						>
-							Phone Number
+							PHONE NUMBER
 						</label>
 						<input
 							id="test-phone"
@@ -208,23 +237,54 @@
 							oninput={handlePhoneInput}
 							placeholder="Enter your phone number"
 							maxlength="14"
-							class="block w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-black focus:ring-0 focus:outline-none"
+							class="block w-full rounded-[2px] border border-hazard-white/30 bg-canvas px-4 py-2.5 text-sm text-text-primary placeholder-text-secondary transition-colors duration-150 focus:border-mint focus:ring-0 focus:outline-none"
 						/>
 					</div>
 
-					<!-- Seed display -->
-					<div class="flex items-center justify-between rounded-lg bg-gray-100 px-4 py-2.5">
-						<span class="text-xs font-medium text-gray-500">Seed</span>
-						<span class="font-mono text-sm font-semibold tracking-wider text-gray-700">{seed}</span>
+					<!-- Seed display + optional input -->
+					<div>
+						<div class="flex items-center justify-between rounded-[2px] border border-hazard-white/10 bg-canvas px-4 py-2.5">
+							<span class="font-mono text-[10px] font-medium tracking-[1.8px] text-text-secondary uppercase">SEED</span>
+							<div class="flex items-center gap-2">
+								<span class="font-mono text-sm font-semibold tracking-wider text-mint">{seed}</span>
+								<button
+									onclick={toggleSeedInput}
+									class="cursor-pointer font-mono text-[10px] tracking-[1px] text-text-secondary uppercase transition-colors hover:text-mint"
+									type="button"
+								>
+									{showSeedInput ? 'AUTO' : 'EDIT'}
+								</button>
+							</div>
+						</div>
+
+						{#if showSeedInput}
+							<div class="mt-2 flex gap-2">
+								<input
+									type="text"
+									value={customSeedValue}
+									oninput={handleSeedInput}
+									placeholder="Enter seed"
+									maxlength="10"
+									class="block flex-1 rounded-[2px] border border-hazard-white/30 bg-canvas px-4 py-2 font-mono text-sm text-text-primary placeholder-text-secondary transition-colors duration-150 focus:border-mint focus:ring-0 focus:outline-none"
+								/>
+								<button
+									onclick={regenerateSeed}
+									type="button"
+									class="cursor-pointer rounded-3xl border border-hazard-white/30 bg-transparent px-3 py-2 font-mono text-[10px] tracking-[1px] text-text-muted uppercase transition-colors hover:border-mint hover:text-mint"
+								>
+									⟳
+								</button>
+							</div>
+						{/if}
 					</div>
 
 					<!-- Start button -->
 					<button
 						onclick={startTest}
 						disabled={!name.trim() || !phone.trim()}
-						class="mt-2 w-full cursor-pointer rounded-full border-2 border-black bg-black px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-black/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+						class="mt-2 w-full cursor-pointer rounded-3xl bg-mint px-6 py-3 font-mono text-xs font-semibold tracking-[1.5px] text-text-inverted uppercase transition-all duration-[180ms] hover:bg-white/20 hover:text-text-inverted hover:shadow-[0_0_0_1px_#c2c2c2] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
 					>
-						Start Test
+						START TEST
 					</button>
 				</div>
 			</div>
@@ -235,14 +295,14 @@
 	<!-- PHASE: TEST                                                        -->
 	<!-- ═══════════════════════════════════════════════════════════════════ -->
 {:else if phase === 'test' && currentQuestion}
-	<section class="flex h-dvh w-full flex-col overflow-hidden bg-white">
+	<section class="flex h-dvh w-full flex-col overflow-hidden bg-canvas">
 		<!-- Top bar -->
-		<header class="shrink-0 border-b border-gray-100 px-4 py-3 md:px-8">
+		<header class="shrink-0 border-b border-hazard-white/10 px-4 py-3 md:px-8">
 			<div class="mx-auto flex max-w-4xl items-center justify-between">
 				<!-- Timer -->
 				<div class="flex items-center gap-2">
 					<svg
-						class="h-4 w-4 text-gray-400"
+						class="h-4 w-4 text-text-secondary"
 						viewBox="0 0 24 24"
 						fill="none"
 						stroke="currentColor"
@@ -251,18 +311,18 @@
 						<circle cx="12" cy="12" r="10" />
 						<path d="M12 6v6l4 2" />
 					</svg>
-					<span class="font-mono text-sm font-semibold text-gray-700 tabular-nums"
+					<span class="font-mono text-sm font-semibold tracking-wider text-mint tabular-nums"
 						>{formattedTime()}</span
 					>
 				</div>
 
 				<!-- Question counter -->
-				<div class="text-sm font-semibold tracking-tight text-gray-800">
-					{currentQuestion.number}<span class="text-gray-400">/{totalQuestions}</span>
+				<div class="font-mono text-sm font-semibold tracking-[1px] text-text-primary">
+					{currentQuestion.number}<span class="text-text-secondary">/{totalQuestions}</span>
 				</div>
 
 				<!-- Difficulty badge -->
-				<span class="rounded-full px-3 py-1 text-xs font-semibold capitalize {difficultyColor()}">
+				<span class="rounded-3xl px-3 py-1 font-mono text-[10px] font-semibold tracking-[1.5px] uppercase {difficultyColor()}">
 					{currentQuestion.difficulty}
 				</span>
 			</div>
@@ -274,14 +334,16 @@
 		>
 			<!-- Matrix grid -->
 			<div
-				class="w-full max-w-sm rounded-2xl border border-gray-100 bg-gray-50 p-4 md:max-w-md md:p-6"
+				class="w-full max-w-sm rounded-[20px] border border-hazard-white/10 bg-surface p-4 md:max-w-md md:p-6"
 			>
 				<MatrixGrid grid={currentQuestion.matrix.grid} gridSize={3} />
 			</div>
 
 			<!-- Answer options -->
 			<div class="flex w-full max-w-xl flex-col items-center gap-3">
-				<p class="text-xs font-medium tracking-tight text-gray-400">Select the missing piece</p>
+				<p class="font-mono text-[10px] font-medium tracking-[1.5px] text-text-secondary uppercase">
+					SELECT THE MISSING PIECE
+				</p>
 
 				<div class="flex flex-wrap justify-center gap-2 md:gap-3">
 					{#each currentQuestion.matrix.options as opt, i}
@@ -294,21 +356,21 @@
 							<button
 								onclick={() => selectOption(i)}
 								disabled={submitted}
-								class="relative flex aspect-square w-16 cursor-pointer items-center justify-center border-2 bg-white transition-all duration-200 md:w-20
+								class="relative flex aspect-square w-16 cursor-pointer items-center justify-center rounded-[4px] border bg-canvas transition-all duration-200 md:w-20
 									{showCorrect
-									? 'border-black ring-2 ring-black ring-offset-2'
+									? 'border-mint ring-1 ring-mint'
 									: showWrong
-										? 'border-gray-300 opacity-40'
+										? 'border-text-secondary/30 opacity-40'
 										: isSelected
-											? 'border-black shadow-md'
-											: 'border-gray-300 hover:-translate-y-0.5 hover:border-black'}
+											? 'border-hazard-white'
+											: 'border-hazard-white/30 hover:-translate-y-0.5 hover:border-mint'}
 									disabled:cursor-not-allowed"
 							>
 								<ShapeRenderer elements={opt} size={60} />
 
 								{#if showCorrect}
 									<div
-										class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-black text-white"
+										class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-mint text-text-inverted"
 									>
 										<svg
 											class="h-3 w-3"
@@ -324,7 +386,7 @@
 
 								{#if showWrong}
 									<div
-										class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-400 text-white"
+										class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-ultraviolet text-hazard-white"
 									>
 										<svg
 											class="h-3 w-3"
@@ -342,11 +404,11 @@
 							<!-- Magnifying glass -->
 							<button
 								onclick={() => openEnlarge(opt)}
-								class="absolute -right-1.5 -bottom-1.5 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition-all hover:scale-110 hover:shadow-md"
+								class="absolute -right-1.5 -bottom-1.5 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-hazard-white/20 bg-surface text-text-secondary transition-all hover:scale-110 hover:text-mint"
 								aria-label="Enlarge option {i + 1}"
 							>
 								<svg
-									class="h-3.5 w-3.5 text-gray-500"
+									class="h-3.5 w-3.5"
 									viewBox="0 0 24 24"
 									fill="none"
 									stroke="currentColor"
@@ -366,17 +428,17 @@
 						<button
 							onclick={submitAnswer}
 							disabled={selectedOption === -1}
-							class="rounded-full border-2 border-black bg-black px-6 py-2 text-sm font-semibold text-white transition-all duration-200 hover:bg-black/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40
+							class="rounded-3xl bg-mint px-6 py-2.5 font-mono text-xs font-semibold tracking-[1.5px] text-text-inverted uppercase transition-all duration-[180ms] hover:bg-white/20 hover:text-text-inverted hover:shadow-[0_0_0_1px_#c2c2c2] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40
 								{selectedOption === -1 ? '' : 'cursor-pointer'}"
 						>
-							Submit Answer
+							SUBMIT ANSWER
 						</button>
 					{:else}
 						<button
 							onclick={nextQuestion}
-							class="cursor-pointer rounded-full border-2 border-black bg-black px-6 py-2 text-sm font-semibold text-white transition-all duration-200 hover:bg-black/90 active:scale-[0.98]"
+							class="cursor-pointer rounded-3xl bg-mint px-6 py-2.5 font-mono text-xs font-semibold tracking-[1.5px] text-text-inverted uppercase transition-all duration-[180ms] hover:bg-white/20 hover:text-text-inverted hover:shadow-[0_0_0_1px_#c2c2c2] active:scale-[0.97]"
 						>
-							{currentIndex < totalQuestions - 1 ? 'Next Question →' : 'View Results →'}
+							{currentIndex < totalQuestions - 1 ? 'NEXT QUESTION →' : 'VIEW RESULTS →'}
 						</button>
 					{/if}
 				</div>
@@ -389,26 +451,28 @@
 	<!-- ═══════════════════════════════════════════════════════════════════ -->
 {:else if phase === 'results'}
 	{@const r = results()}
-	<section class="flex min-h-dvh w-full items-center justify-center bg-white p-6">
+	<section class="flex min-h-dvh w-full items-center justify-center bg-canvas p-6">
 		<div class="w-full max-w-md">
-			<div class="rounded-2xl border border-gray-100 bg-gray-50 p-8 md:p-10">
-				<h1 class="mb-1 text-xl font-semibold tracking-tight md:text-2xl">Test Complete</h1>
-				<p class="mb-6 text-sm text-gray-500">
-					{name} · Seed {seed}
+			<div class="rounded-[20px] border border-hazard-white/10 bg-surface p-8 md:p-10">
+				<h1 class="mb-1 font-display text-3xl leading-[0.95] tracking-[1px] text-hazard-white uppercase md:text-4xl">
+					Test Complete
+				</h1>
+				<p class="mb-6 font-mono text-[11px] tracking-[1.1px] text-text-secondary uppercase">
+					{name} · SEED {seed}
 				</p>
 
 				<!-- Score circle -->
 				<div class="mb-8 flex flex-col items-center">
 					<div
-						class="flex h-28 w-28 items-center justify-center rounded-full border-4 border-black"
+						class="flex h-28 w-28 items-center justify-center rounded-full border-2 border-mint"
 					>
 						<div class="text-center">
-							<span class="text-3xl font-bold">{r.correct}</span>
-							<span class="text-lg text-gray-400">/{r.total}</span>
+							<span class="text-3xl font-bold text-mint">{r.correct}</span>
+							<span class="text-lg text-text-secondary">/{r.total}</span>
 						</div>
 					</div>
-					<p class="mt-3 text-sm font-medium text-gray-500">
-						{Math.round((r.correct / r.total) * 100)}% Accuracy
+					<p class="mt-3 font-mono text-[11px] font-medium tracking-[1.5px] text-text-secondary uppercase">
+						{Math.round((r.correct / r.total) * 100)}% ACCURACY
 					</p>
 				</div>
 
@@ -418,17 +482,17 @@
 						{@const d = r.byDifficulty[diff]}
 						{@const color =
 							diff === 'easy'
-								? 'bg-emerald-100 text-emerald-700'
+								? 'bg-mint/20 text-mint'
 								: diff === 'medium'
-									? 'bg-amber-100 text-amber-700'
-									: 'bg-red-100 text-red-700'}
+									? 'bg-ultraviolet/20 text-[#a78bfa]'
+									: 'bg-hazard-white/10 text-hazard-white'}
 						<div
-							class="flex items-center justify-between rounded-lg border border-gray-100 bg-white px-4 py-2.5"
+							class="flex items-center justify-between rounded-[2px] border border-hazard-white/10 bg-canvas px-4 py-2.5"
 						>
-							<span class="rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize {color}">
+							<span class="rounded-3xl px-2.5 py-0.5 font-mono text-[10px] font-semibold tracking-[1.5px] uppercase {color}">
 								{diff}
 							</span>
-							<span class="text-sm font-semibold text-gray-700">
+							<span class="font-mono text-sm font-semibold tracking-wider text-text-primary">
 								{d.correct}/{d.total}
 							</span>
 						</div>
@@ -437,25 +501,25 @@
 
 				<!-- Time -->
 				<div
-					class="mb-6 flex items-center justify-between rounded-lg border border-gray-100 bg-white px-4 py-2.5"
+					class="mb-6 flex items-center justify-between rounded-[2px] border border-hazard-white/10 bg-canvas px-4 py-2.5"
 				>
-					<span class="text-xs font-medium text-gray-500">Time Taken</span>
-					<span class="font-mono text-sm font-semibold text-gray-700">{formattedTime()}</span>
+					<span class="font-mono text-[10px] font-medium tracking-[1.8px] text-text-secondary uppercase">TIME TAKEN</span>
+					<span class="font-mono text-sm font-semibold tracking-wider text-mint">{formattedTime()}</span>
 				</div>
 
 				<!-- Actions -->
 				<div class="flex flex-col gap-2">
 					<button
 						onclick={restartTest}
-						class="w-full cursor-pointer rounded-full border-2 border-black bg-black px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-black/90 active:scale-[0.98]"
+						class="w-full cursor-pointer rounded-3xl bg-mint px-6 py-3 font-mono text-xs font-semibold tracking-[1.5px] text-text-inverted uppercase transition-all duration-[180ms] hover:bg-white/20 hover:text-text-inverted hover:shadow-[0_0_0_1px_#c2c2c2] active:scale-[0.97]"
 					>
-						Take Another Test
+						TAKE ANOTHER TEST
 					</button>
 					<a
 						href="/"
-						class="block w-full cursor-pointer rounded-full border-2 border-gray-300 bg-white px-6 py-3 text-center text-sm font-semibold text-gray-700 transition-all duration-200 hover:border-black"
+						class="block w-full cursor-pointer rounded-3xl border border-hazard-white/30 bg-transparent px-6 py-3 text-center font-mono text-xs font-semibold tracking-[1.5px] text-text-muted uppercase transition-all duration-[180ms] hover:border-mint hover:text-mint"
 					>
-						Back to Home
+						BACK TO HOME
 					</a>
 				</div>
 			</div>

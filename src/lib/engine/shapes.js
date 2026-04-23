@@ -108,16 +108,44 @@ export const SHAPE_TYPES = [
 	'cross'
 ];
 
+/**
+ * Shapes that are visually distinct under rotation.
+ * Excludes shapes with high rotational symmetry:
+ *   - circle: infinite rotational symmetry
+ *   - square: 4-fold (90° symmetry)
+ *   - hexagon: 6-fold (60° symmetry)
+ */
+export const ROTATION_SAFE_SHAPES = ['triangle', 'diamond', 'pentagon', 'star', 'cross'];
+
 /** All available fill types */
 export const FILL_TYPES = ['solid', 'striped', 'empty'];
 
 /**
- * Get SVG fill value string for a fill type
+ * Get SVG fill value string for a fill type (dark-theme: white shapes)
  * @param {string} fillType - 'solid' | 'striped' | 'empty'
  * @param {string} patternId - ID of the stripe pattern element
  * @returns {string}
  */
 export function getFillValue(fillType, patternId = 'stripes') {
+	switch (fillType) {
+		case 'solid':
+			return '#ffffff';
+		case 'empty':
+			return 'none';
+		case 'striped':
+			return `url(#${patternId})`;
+		default:
+			return '#ffffff';
+	}
+}
+
+/**
+ * Get SVG fill value for light-mode SVG export (black shapes on white bg)
+ * @param {string} fillType
+ * @param {string} patternId
+ * @returns {string}
+ */
+export function getFillValueExport(fillType, patternId = 'stripes') {
 	switch (fillType) {
 		case 'solid':
 			return '#000000';
@@ -140,7 +168,7 @@ export function getStrokeWidth(fillType) {
 }
 
 /**
- * Render one element to an SVG markup string (used for SVG export)
+ * Render one element to an SVG markup string (used for SVG export — light mode)
  * @param {object} el - Element descriptor
  * @param {number} cx - Center X in SVG units
  * @param {number} cy - Center Y in SVG units
@@ -149,7 +177,7 @@ export function getStrokeWidth(fillType) {
  * @returns {string} SVG markup
  */
 export function elementToSVGString(el, cx, cy, radius, patternId) {
-	const fill = getFillValue(el.fill, patternId);
+	const fill = getFillValueExport(el.fill, patternId);
 	const stroke = '#000000';
 	const sw = getStrokeWidth(el.fill);
 	const rotation = el.rotation || 0;

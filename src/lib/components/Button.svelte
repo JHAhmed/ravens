@@ -1,12 +1,18 @@
 <script>
-	let { text = 'Button', disabled = false, onclick = () => {} } = $props();
+	let { text = 'Button', disabled = false, onclick = () => {}, variant = 'primary' } = $props();
 </script>
 
 <button
 	class="
-    cursor-pointer rounded-full border-2 border-black bg-white px-3 py-1 text-sm font-medium tracking-tight transition-all duration-200 hover:-translate-y-0.5 hover:bg-black hover:text-white
-    hover:shadow-xl active:scale-98 active:bg-black active:text-white focus:bg-black focus:text-white disabled:cursor-not-allowed disabled:opacity-50 md:px-6 md:py-2 md:text-base"
+		cursor-pointer rounded-3xl px-5 py-2.5 text-xs font-semibold tracking-[1.5px] uppercase transition-all duration-[180ms] ease-out
+		active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40
+		font-mono
+		{variant === 'primary'
+			? 'border-none bg-mint text-text-inverted hover:bg-white/20 hover:text-black hover:shadow-[0_0_0_1px_#c2c2c2] active:bg-dim-gray/87 active:opacity-50'
+			: 'border border-mint bg-transparent text-mint hover:bg-mint hover:text-text-inverted'}
+		md:px-6 md:py-3 md:text-sm"
 	{onclick}
-	{disabled}>
+	{disabled}
+>
 	{text}
 </button>

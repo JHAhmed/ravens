@@ -5,9 +5,13 @@
  *   id, name, category, description, modifies (property),
  *   conflictsWith (array of rule ids), gridSizes (allowed grid sizes),
  *   apply(grid, gridSize) – mutates grid cells in place.
+ *
+ * Rules now support per-element targeting for mixed-symbol rows:
+ *   apply(grid, gridSize, elementIndex?) – when elementIndex is provided,
+ *   the rule only affects that specific element within each cell.
  */
 
-import { SHAPE_TYPES, FILL_TYPES, getSizesForGrid } from './shapes.js';
+import { SHAPE_TYPES, FILL_TYPES, ROTATION_SAFE_SHAPES, getSizesForGrid } from './shapes.js';
 
 // ── helpers ──────────────────────────────────────────────────────────
 
@@ -52,7 +56,7 @@ function generateLatinSquare(n) {
 /**
  * Return nicely-spaced positions for `count` elements inside a 0-1 cell.
  */
-function getElementPositions(count) {
+export function getElementPositions(count) {
 	if (count === 1) return [{ x: 0.5, y: 0.5 }];
 	if (count === 2)
 		return [
@@ -95,6 +99,22 @@ function getElementPositions(count) {
 	return out;
 }
 
+/**
+ * Helper: iterate elements in cells, optionally targeting only one element index.
+ */
+function forEachElement(grid, gridSize, elementIndex, callback) {
+	for (let r = 0; r < gridSize; r++) {
+		for (let c = 0; c < gridSize; c++) {
+			const cell = grid[r][c];
+			if (!cell) continue;
+			for (let e = 0; e < cell.length; e++) {
+				if (elementIndex !== undefined && e !== elementIndex) continue;
+				callback(cell[e], r, c, e);
+			}
+		}
+	}
+}
+
 // ── rule categories ──────────────────────────────────────────────────
 
 export const RULE_CATEGORIES = {
@@ -106,29 +126,21 @@ export const RULE_CATEGORIES = {
 
 // ── apply functions ──────────────────────────────────────────────────
 
-function applyRotation(grid, gridSize) {
-	const increment = randomChoice([45, 90, 120]);
-	for (let r = 0; r < gridSize; r++) {
-		for (let c = 0; c < gridSize; c++) {
-			for (const el of grid[r][c]) {
-				el.rotation = (el.rotation || 0) + c * increment;
-			}
-		}
-	}
+function applyRotation(grid, gridSize, elementIndex) {
+	const increment = randomChoice([30, 45, 60]);
+	forEachElement(grid, gridSize, elementIndex, (el, r, c) => {
+		el.rotation = (el.rotation || 0) + c * increment;
+	});
 }
 
-function applySizeProgression(grid, gridSize) {
+function applySizeProgression(grid, gridSize, elementIndex) {
 	const sizes = getSizesForGrid(gridSize);
-	for (let r = 0; r < gridSize; r++) {
-		for (let c = 0; c < gridSize; c++) {
-			for (const el of grid[r][c]) {
-				el.size = sizes[c];
-			}
-		}
-	}
+	forEachElement(grid, gridSize, elementIndex, (el, r, c) => {
+		el.size = sizes[c];
+	});
 }
 
-function applyTranslation(grid, gridSize) {
+function applyTranslation(grid, gridSize, elementIndex) {
 	const patterns = [
 		// diagonal ↘
 		Array.from({ length: gridSize }, (_, i) => ({
@@ -147,14 +159,10 @@ function applyTranslation(grid, gridSize) {
 		}))
 	];
 	const positions = randomChoice(patterns);
-	for (let r = 0; r < gridSize; r++) {
-		for (let c = 0; c < gridSize; c++) {
-			for (const el of grid[r][c]) {
-				el.x = positions[c].x;
-				el.y = positions[c].y;
-			}
-		}
-	}
+	forEachElement(grid, gridSize, elementIndex, (el, r, c) => {
+		el.x = positions[c].x;
+		el.y = positions[c].y;
+	});
 }
 
 // ── set logic (3×3 only) ─────────────────────────────────────────────
@@ -253,25 +261,24 @@ function applySetSubtract(grid, gridSize) {
 
 // ── distribution ─────────────────────────────────────────────────────
 
-function applyDistributionShape(grid, gridSize) {
+function applyDistributionShape(grid, gridSize, elementIndex) {
 	const available = shuffleArray([...SHAPE_TYPES]).slice(0, gridSize);
 	const latin = generateLatinSquare(gridSize);
-	for (let r = 0; r < gridSize; r++) {
-		for (let c = 0; c < gridSize; c++) {
-			for (const el of grid[r][c]) {
-				el.shape = available[latin[r][c]];
-			}
-		}
-	}
+	forEachElement(grid, gridSize, elementIndex, (el, r, c) => {
+		el.shape = available[latin[r][c]];
+	});
 }
 
-function applyConstantFill(grid, gridSize) {
+function applyConstantFill(grid, gridSize, elementIndex) {
 	const fills = shuffleArray([...FILL_TYPES]);
 	for (let r = 0; r < gridSize; r++) {
 		const fill = fills[r % fills.length];
 		for (let c = 0; c < gridSize; c++) {
-			for (const el of grid[r][c]) {
-				el.fill = fill;
+			const cell = grid[r][c];
+			if (!cell) continue;
+			for (let e = 0; e < cell.length; e++) {
+				if (elementIndex !== undefined && e !== elementIndex) continue;
+				cell[e].fill = fill;
 			}
 		}
 	}
@@ -299,16 +306,12 @@ function applyIncrementalCount(grid, gridSize) {
 	}
 }
 
-function applyProgressiveComplexity(grid, gridSize) {
+function applyProgressiveComplexity(grid, gridSize, elementIndex) {
 	const progressive = ['triangle', 'square', 'pentagon', 'hexagon', 'star'];
 	const start = randomInt(0, Math.max(0, progressive.length - gridSize));
-	for (let r = 0; r < gridSize; r++) {
-		for (let c = 0; c < gridSize; c++) {
-			for (const el of grid[r][c]) {
-				el.shape = progressive[(start + c) % progressive.length];
-			}
-		}
-	}
+	forEachElement(grid, gridSize, elementIndex, (el, r, c) => {
+		el.shape = progressive[(start + c) % progressive.length];
+	});
 }
 
 // ── exported rule list + helpers ─────────────────────────────────────

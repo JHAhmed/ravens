@@ -1,6 +1,65 @@
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 @import 'tailwindcss';
 
 @theme {
-	--font-sans: 'Urbanist', sans-serif;
+	/* ── Fonts ──────────────────────────────────────────────────── */
+	--font-display: 'Anton', Impact, Helvetica, sans-serif;
+	--font-sans: 'Space Grotesk', Helvetica, Arial, sans-serif;
+	--font-mono: 'Space Mono', 'Courier New', Courier, monospace;
+
+	/* ── Brand Hazards ─────────────────────────────────────────── */
+	--color-mint: #3cffd0;
+	--color-ultraviolet: #5200ff;
+	--color-mint-border: #309875;
+	--color-link-hover: #3860be;
+	--color-focus-cyan: #1eaedb;
+	--color-purple-rule: #3d00bf;
+
+	/* ── Surface & Background ──────────────────────────────────── */
+	--color-canvas: #131313;
+	--color-surface: #2d2d2d;
+	--color-image-frame: #313131;
+	--color-hazard-white: #ffffff;
+
+	/* ── Neutrals & Text ───────────────────────────────────────── */
+	--color-text-primary: #ffffff;
+	--color-text-secondary: #949494;
+	--color-text-muted: #e9e9e9;
+	--color-text-inverted: #131313;
+
+	/* ── Semantic ───────────────────────────────────────────────── */
+	--color-dim-gray: #8c8c8c;
+}
+
+/* ── Global Base ───────────────────────────────────────────────── */
+html {
+	background-color: var(--color-canvas);
+	color: var(--color-text-primary);
+}
+
+body {
+	font-family: var(--font-sans);
+	background-color: var(--color-canvas);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+	background-color: rgba(60, 255, 208, 0.3);
+	color: #ffffff;
+}
+
+/* ── Scrollbar (dark) ──────────────────────────────────────────── */
+::-webkit-scrollbar {
+	width: 6px;
+}
+::-webkit-scrollbar-track {
+	background: var(--color-canvas);
+}
+::-webkit-scrollbar-thumb {
+	background: var(--color-surface);
+	border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: var(--color-dim-gray);
 }
