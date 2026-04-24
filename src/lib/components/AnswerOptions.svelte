@@ -1,7 +1,7 @@
 <script>
 	import ShapeRenderer from './ShapeRenderer.svelte';
 
-	let { options = [], correctIndex = -1, onSelect = () => {} } = $props();
+	let { options = [], correctIndex = -1, onSelect = () => {}, cellSize = 80 } = $props();
 
 	let selected = $state(-1);
 	let revealed = $state(false);
@@ -23,8 +23,8 @@
 </script>
 
 <div class="mt-6 flex flex-col items-center gap-3">
-	<p class="font-mono text-xs font-medium tracking-[1.5px] text-text-secondary uppercase">
-		SELECT THE MISSING PIECE
+	<p class="text-xs font-semibold tracking-[1.08px] text-warm-silver uppercase">
+		Select the missing piece
 	</p>
 
 	<div class="flex flex-wrap justify-center gap-2 md:gap-3">
@@ -35,21 +35,22 @@
 			<button
 				onclick={() => pick(i)}
 				disabled={revealed && !isSelected && !isCorrectOption}
-				class="group relative flex aspect-square w-16 cursor-pointer items-center justify-center rounded-[4px] border bg-canvas transition-all duration-200 md:w-20
+				class="group relative flex aspect-square cursor-pointer items-center justify-center border-2 bg-white transition-all duration-200 ease-out
 					{revealed && isCorrectOption
-					? 'border-mint ring-1 ring-mint'
+					? 'border-accent ring-2 ring-accent ring-offset-2'
 					: revealed && isSelected && !isCorrectOption
-						? 'border-text-secondary/30 opacity-40'
+						? 'border-oat opacity-40'
 						: isSelected
-							? 'border-hazard-white'
-							: 'border-hazard-white/30 hover:-translate-y-0.5 hover:border-mint'}
+							? 'hard-shadow-sm border-black'
+							: 'border-oat hover:hard-shadow-sm hover:border-black'}
 					disabled:cursor-not-allowed"
+				style="width:{cellSize}px; height:{cellSize}px"
 			>
-				<ShapeRenderer elements={opt} size={60} />
+				<ShapeRenderer elements={opt} size={Math.round(cellSize * 0.75)} />
 
 				{#if revealed && isCorrectOption}
 					<div
-						class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-mint text-text-inverted"
+						class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center bg-accent text-white"
 					>
 						<svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
 							<path d="M5 13l4 4L19 7" />
@@ -59,7 +60,7 @@
 
 				{#if revealed && isSelected && !isCorrectOption}
 					<div
-						class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-ultraviolet text-hazard-white"
+						class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center bg-wrong text-white"
 					>
 						<svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
 							<path d="M6 18L18 6M6 6l12 12" />

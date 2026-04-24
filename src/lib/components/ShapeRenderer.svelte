@@ -8,7 +8,7 @@
 		getStrokeWidth
 	} from '$lib/engine/shapes.js';
 
-	let { elements = [], size = 100 } = $props();
+	let { elements = [], size = 100, showRotationArrow = false } = $props();
 
 	const patternId = `sp-${Math.random().toString(36).slice(2, 8)}`;
 </script>
@@ -22,7 +22,7 @@
 			height="8"
 			patternTransform="rotate(45)"
 		>
-			<rect width="3" height="8" fill="white" />
+			<rect width="3" height="8" fill="black" />
 		</pattern>
 	</defs>
 
@@ -31,7 +31,7 @@
 		{@const cy = el.y * 100}
 		{@const radius = SIZE_MAP[el.size] || SIZE_MAP.medium}
 		{@const fill = getFillValue(el.fill, patternId)}
-		{@const stroke = '#ffffff'}
+		{@const stroke = '#000000'}
 		{@const sw = getStrokeWidth(el.fill)}
 		{@const rot = el.rotation || 0}
 
@@ -86,6 +86,17 @@
 					{fill}
 					{stroke}
 					stroke-width={sw}
+				/>
+			{/if}
+
+			{#if showRotationArrow && rot !== 0}
+				{@const arrowSize = Math.max(4, radius * 0.22)}
+				{@const arrowY = cy - radius - arrowSize - 2}
+				<polygon
+					points="{cx},{arrowY - arrowSize} {cx - arrowSize * 0.7},{arrowY + arrowSize * 0.3} {cx + arrowSize * 0.7},{arrowY + arrowSize * 0.3}"
+					fill="#d94040"
+					stroke="none"
+					opacity="0.85"
 				/>
 			{/if}
 		</g>

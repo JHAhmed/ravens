@@ -248,6 +248,48 @@ function createDistractors(answer, grid, gridSize) {
 	return distractors.slice(0, 5);
 }
 
+// ── size-only duplicate removal ──────────────────────────────────────
+
+/**
+ * Strips `size` from every element to produce a comparison key.
+ * Two options that are identical except for size will have the same key.
+ */
+function optionKeyWithoutSize(opt) {
+	return JSON.stringify(
+		opt.map((el) => {
+			const { size, ...rest } = el;
+			return rest;
+		})
+	);
+}
+
+/**
+ * Mutate `allOptions` in-place: if any two options (including the answer at
+ * index 0) are identical once `size` is ignored, replace the later one by
+ * varying its position instead.
+ */
+function deduplicateSizeOnly(allOptions) {
+	const seen = new Map(); // key → first index
+	for (let i = 0; i < allOptions.length; i++) {
+		const key = optionKeyWithoutSize(allOptions[i]);
+		if (seen.has(key)) {
+			// Vary position of the duplicate distractor (never touch index 0 = answer)
+			const target = i === 0 ? seen.get(key) : i;
+			if (target === 0) continue; // never mutate the answer
+			const d = deepClone(allOptions[target]);
+			// Shift position of first element
+			d[0].x = Math.min(0.8, d[0].x + 0.2);
+			d[0].y = Math.min(0.8, d[0].y + 0.15);
+			// Also change fill to make it more distinct
+			const otherFills = FILL_TYPES.filter((f) => f !== d[0].fill);
+			if (otherFills.length) d[0].fill = randomChoice(otherFills);
+			allOptions[target] = d;
+		} else {
+			seen.set(key, i);
+		}
+	}
+}
+
 // ── public API ───────────────────────────────────────────────────────
 
 /**
@@ -301,13 +343,16 @@ export function generateMatrix(gridSize, selectedRuleIds) {
 	// 4. distractors
 	const distractors = createDistractors(answer, grid, gridSize);
 
-	// 5. shuffle options
-	const allOptions = [answer, ...distractors];
-	const indices = shuffleArray([...Array(allOptions.length).keys()]);
-	const options = indices.map((i) => allOptions[i]);
+	// 5. deduplicate options that differ only by size
+	const allRaw = [answer, ...distractors];
+	deduplicateSizeOnly(allRaw);
+
+	// 6. shuffle options
+	const indices = shuffleArray([...Array(allRaw.length).keys()]);
+	const options = indices.map((i) => allRaw[i]);
 	const correctIndex = indices.indexOf(0);
 
-	// 6. mark missing cell
+	// 7. mark missing cell
 	grid[gridSize - 1][gridSize - 1] = null;
 
 	return { grid, answer, options, correctIndex };

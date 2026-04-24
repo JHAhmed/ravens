@@ -205,6 +205,36 @@ function createDistractorsSeeded(answer, grid, gridSize, rng) {
 	return distractors.slice(0, 5);
 }
 
+// ── size-only duplicate removal (seeded) ─────────────────────────────
+
+function optionKeyWithoutSize(opt) {
+	return JSON.stringify(
+		opt.map((el) => {
+			const { size, ...rest } = el;
+			return rest;
+		})
+	);
+}
+
+function deduplicateSizeOnlySeeded(allOptions, rng) {
+	const seen = new Map();
+	for (let i = 0; i < allOptions.length; i++) {
+		const key = optionKeyWithoutSize(allOptions[i]);
+		if (seen.has(key)) {
+			const target = i === 0 ? seen.get(key) : i;
+			if (target === 0) continue;
+			const d = deepClone(allOptions[target]);
+			d[0].x = Math.min(0.8, d[0].x + 0.2);
+			d[0].y = Math.min(0.8, d[0].y + 0.15);
+			const otherFills = FILL_TYPES.filter((f) => f !== d[0].fill);
+			if (otherFills.length) d[0].fill = seededChoice(otherFills, rng);
+			allOptions[target] = d;
+		} else {
+			seen.set(key, i);
+		}
+	}
+}
+
 // ── Seeded matrix generation ─────────────────────────────────────────
 
 /**
@@ -257,9 +287,11 @@ function generateMatrixSeeded(gridSize, selectedRuleIds, rng) {
 	const answer = deepClone(grid[gridSize - 1][gridSize - 1]);
 	const distractors = createDistractorsSeeded(answer, grid, gridSize, rng);
 
-	const allOptions = [answer, ...distractors];
-	const indices = seededShuffle([...Array(allOptions.length).keys()], rng);
-	const options = indices.map((i) => allOptions[i]);
+	const allRaw = [answer, ...distractors];
+	deduplicateSizeOnlySeeded(allRaw, rng);
+
+	const indices = seededShuffle([...Array(allRaw.length).keys()], rng);
+	const options = indices.map((i) => allRaw[i]);
 	const correctIndex = indices.indexOf(0);
 
 	grid[gridSize - 1][gridSize - 1] = null;

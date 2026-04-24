@@ -37,13 +37,11 @@
 </script>
 
 <aside class="flex w-full flex-col gap-3 lg:w-56">
-	<h3 class="font-mono text-[10px] font-medium tracking-[1.8px] text-text-secondary uppercase">RULES</h3>
+	<h3 class="text-[12px] font-semibold tracking-[1.08px] text-warm-silver uppercase">Rules</h3>
 
 	{#each rulesByCategory as cat}
 		<div>
-			<p class="mb-1 font-mono text-[10px] font-medium tracking-[1.1px] text-mint uppercase">
-				{cat.name}
-			</p>
+			<p class="mb-1 text-xs font-medium text-dark-charcoal">{cat.name}</p>
 			<div class="flex flex-col gap-0.5">
 				{#each cat.rules as rule}
 					{@const checked = selectedRules.includes(rule.id)}
@@ -53,23 +51,23 @@
 						type="button"
 						onclick={() => toggleRule(rule.id)}
 						disabled={disabled && !checked}
-						class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors duration-150
-							{checked ? 'bg-surface' : 'hover:bg-surface/50'}
+						class="flex cursor-pointer items-center gap-2 px-2 py-1.5 text-left transition-colors duration-150
+							{checked ? 'bg-oat-light' : 'hover:bg-oat-light/50'}
 							{disabled && !checked ? 'cursor-not-allowed opacity-30' : ''}"
 					>
 						<div
-							class="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-all duration-150
-								{checked ? 'border-mint bg-mint' : 'border-hazard-white/30 bg-transparent'}"
+							class="flex h-4 w-4 shrink-0 items-center justify-center border-2 transition-all duration-150
+								{checked ? 'border-black bg-black' : 'border-oat bg-white'}"
 						>
 							{#if checked}
-								<svg class="h-2.5 w-2.5 text-text-inverted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
+								<svg class="h-2.5 w-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
 									<path d="M5 13l4 4L19 7" />
 								</svg>
 							{/if}
 						</div>
 						<div class="flex flex-col">
-							<span class="text-[13px] font-medium leading-tight text-text-primary">{rule.name}</span>
-							<span class="text-[10px] leading-tight text-text-secondary">{rule.description}</span>
+							<span class="text-[13px] font-medium leading-tight text-black">{rule.name}</span>
+							<span class="text-[10px] leading-tight text-warm-silver">{rule.description}</span>
 						</div>
 					</button>
 				{/each}

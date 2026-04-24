@@ -10,6 +10,8 @@
 	let difficulty = $state('easy');
 	let selectedRules = $state([]);
 	let matrix = $state(null);
+	let showGrid = $state(true);
+	let showRotationArrow = $state(false);
 
 	const maxRules = $derived(difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3);
 
@@ -60,34 +62,34 @@
 	/>
 </svelte:head>
 
-<section class="flex h-dvh w-full flex-col overflow-hidden bg-canvas">
+<section class="flex min-h-dvh w-full flex-col bg-cream">
 	<!-- Header -->
-	<header class="shrink-0 border-b border-hazard-white/10 px-4 py-3 md:px-8">
+	<header class="shrink-0 border-b border-oat px-4 py-3 md:px-8">
 		<div class="mx-auto flex max-w-7xl items-center justify-between">
 			<a
 				href="/"
-				class="flex items-center gap-2 font-mono text-[11px] font-medium tracking-[1.1px] text-text-secondary uppercase transition-colors duration-150 hover:text-mint"
+				class="flex items-center gap-2 text-sm font-medium text-warm-silver transition-colors duration-150 hover:text-black"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
-					width="16"
-					height="16"
+					width="18"
+					height="18"
 					viewBox="0 0 24 24"
 				>
 					<path fill="currentColor" d="m14 18l-6-6l6-6l1.4 1.45L10.85 12l4.55 4.55z" />
 				</svg>
-				BACK
+				Back
 			</a>
-			<h1 class="font-mono text-[11px] font-semibold tracking-[1.8px] text-text-primary uppercase md:text-xs">
-				RAYWHEN GENERATOR
-			</h1>
+			<h1 class="text-sm font-semibold tracking-tight md:text-base">Raywhen Generator</h1>
 			<div class="w-14"></div>
 		</div>
 	</header>
 
-	<!-- Main: 3-column on desktop (controls | matrix | rules) -->
+	<!-- Main: responsive layout -->
+	<!-- On large screens: 3-col side by side, tries to fit in remaining viewport -->
+	<!-- On small screens / scaled: stacks vertically and scrolls naturally -->
 	<main
-		class="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-4 overflow-y-auto px-4 py-4 md:px-8 lg:flex-row lg:gap-6 lg:overflow-hidden"
+		class="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 px-4 py-4 md:px-8 lg:flex-row lg:gap-6"
 	>
 		<!-- LEFT: Config + Buttons -->
 		<ControlPanel
@@ -101,15 +103,38 @@
 		/>
 
 		<!-- CENTER: Matrix + Answers -->
-		<div class="flex min-h-0 flex-1 flex-col items-center justify-start gap-3 lg:overflow-y-auto">
+		<div class="flex flex-1 flex-col items-center justify-start gap-3">
 			{#if matrix}
-				<div class="w-full max-w-lg rounded-[20px] border border-hazard-white/10 bg-surface p-4 md:p-6">
-					<MatrixGrid grid={matrix.grid} {gridSize} />
+				<!-- Toolbar -->
+				<div class="flex items-center gap-2">
+					<button
+						onclick={() => (showGrid = !showGrid)}
+						class="cursor-pointer border-2 px-3 py-1 text-xs font-semibold transition-all duration-150
+							{showGrid
+							? 'border-black bg-black text-white'
+							: 'border-oat bg-white text-warm-silver hover:border-black hover:text-black'}"
+					>
+						⊞ Grid Lines
+					</button>
+					<button
+						onclick={() => (showRotationArrow = !showRotationArrow)}
+						class="cursor-pointer border-2 px-3 py-1 text-xs font-semibold transition-all duration-150
+							{showRotationArrow
+							? 'border-black bg-black text-white'
+							: 'border-oat bg-white text-warm-silver hover:border-black hover:text-black'}"
+					>
+						↻ Rotation Arrow
+					</button>
+				</div>
+
+				<div class="w-full max-w-lg border-2 border-oat bg-white p-4 md:p-6">
+					<MatrixGrid grid={matrix.grid} {gridSize} displayGrid={showGrid} {showRotationArrow} />
 				</div>
 
 				<AnswerOptions
 					options={matrix.options}
 					correctIndex={matrix.correctIndex}
+					cellSize={120}
 					onSelect={(i) => {
 						/* could track stats here */
 					}}
@@ -117,23 +142,23 @@
 			{:else}
 				<!-- Empty state -->
 				<div
-					class="flex aspect-square w-full max-w-sm flex-col items-center justify-center rounded-[20px] border border-dashed border-hazard-white/20 bg-surface/30 p-8"
+					class="flex aspect-square w-full max-w-sm flex-col items-center justify-center border-2 border-dashed border-oat bg-white p-8"
 				>
 					<svg
-						class="mb-4 h-12 w-12 text-text-secondary/40"
+						class="mb-4 h-12 w-12 text-oat"
 						viewBox="0 0 24 24"
 						fill="none"
 						stroke="currentColor"
 						stroke-width="1.5"
 					>
-						<rect x="3" y="3" width="7" height="7" rx="1" />
-						<rect x="14" y="3" width="7" height="7" rx="1" />
-						<rect x="3" y="14" width="7" height="7" rx="1" />
-						<rect x="14" y="14" width="7" height="7" rx="1" stroke-dasharray="3,2" />
+						<rect x="3" y="3" width="7" height="7" rx="0" />
+						<rect x="14" y="3" width="7" height="7" rx="0" />
+						<rect x="3" y="14" width="7" height="7" rx="0" />
+						<rect x="14" y="14" width="7" height="7" rx="0" stroke-dasharray="3,2" />
 					</svg>
-					<p class="text-center font-mono text-xs tracking-[1px] text-text-secondary uppercase">
-						Select rules and hit <span class="text-mint">Generate</span> or
-						<span class="text-mint">Randomize</span>
+					<p class="text-center text-sm font-medium text-warm-silver">
+						Select rules and hit <span class="font-semibold text-black">Generate</span> or
+						<span class="font-semibold text-black">Randomize</span>
 					</p>
 				</div>
 			{/if}

@@ -12,27 +12,27 @@
 	<meta property="og:url" content="{page.url.origin}/" />
 </svelte:head>
 
-<section class="flex h-dvh w-dvw flex-col items-center justify-center bg-canvas p-8 md:p-16">
+<section class="flex h-dvh w-dvw flex-col items-center justify-center bg-cream p-8 md:p-16">
 	<div
-		class="relative flex h-full w-full flex-col items-center justify-center space-y-10 rounded-[20px] border border-hazard-white/10 bg-surface p-8 md:p-16"
+		class="relative flex h-full w-full flex-col items-center justify-center gap-8 border-2 border-oat bg-white p-8 md:p-16"
 	>
 		<!-- Display headline -->
-		<h1 class="text-center font-display text-5xl leading-[0.95] tracking-[1px] text-hazard-white uppercase md:text-7xl lg:text-8xl">
+		<h1 class="text-center text-5xl font-semibold leading-[1.00] tracking-[-2px] text-black md:text-7xl md:tracking-[-3.2px]">
 			Raywhen
 		</h1>
 
-		<!-- Thin-weight eyebrow -->
-		<p class="text-center text-[19px] font-light tracking-[1.9px] text-text-secondary uppercase">
+		<!-- Eyebrow -->
+		<p class="text-center text-lg font-light tracking-tight text-warm-silver">
 			by Jamal Haneef
 		</p>
 
 		<div class="flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
-			<!-- Primary CTA — Jelly Mint Pill -->
+			<!-- Primary CTA -->
 			<a
 				href="/generator"
-				class="group inline-flex items-center rounded-3xl border-none bg-mint px-6 py-3 font-mono text-xs font-semibold tracking-[1.5px] text-text-inverted uppercase transition-all duration-[180ms] hover:bg-white/20 hover:text-text-inverted hover:shadow-[0_0_0_1px_#c2c2c2] active:scale-[0.97] md:px-8 md:py-3.5 md:text-sm"
+				class="group inline-flex items-center border-2 border-black bg-black px-6 py-3 text-sm font-semibold tracking-tight text-white shadow-accent transition-all duration-200 ease-out hover:hard-shadow-base active:translate-0 active:shadow-none md:px-8 md:py-3.5"
 			>
-				RAVENIZER
+				Ravenizer
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="20"
@@ -47,12 +47,12 @@
 				</svg>
 			</a>
 
-			<!-- Secondary — Dark Slate Pill -->
+			<!-- Secondary CTA -->
 			<a
 				href="/test"
-				class="group inline-flex items-center rounded-3xl border border-hazard-white/30 bg-transparent px-6 py-3 font-mono text-xs font-semibold tracking-[1.5px] text-text-muted uppercase transition-all duration-[180ms] hover:border-mint hover:text-mint active:scale-[0.97] md:px-8 md:py-3.5 md:text-sm"
+				class="group inline-flex items-center border-2 border-black bg-white px-6 py-3 text-sm font-semibold tracking-tight text-black transition-all duration-200 ease-out hover:hard-shadow-base active:translate-0 active:shadow-none md:px-8 md:py-3.5"
 			>
-				TAKE A TEST
+				Take a Test
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="20"
