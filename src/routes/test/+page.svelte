@@ -6,6 +6,7 @@
 	import { randomSeed } from '$lib/engine/seededRandom.js';
 	import { dev } from '$app/environment';
 	import Icon from '@iconify/svelte';
+	import { page } from '$app/state';
 
 	// ── State machine: 'form' → 'test' → 'results' ──────────────────
 	let phase = $state('form');
