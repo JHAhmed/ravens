@@ -61,13 +61,14 @@
 
 			{#if showRotationArrow}
 				{@const arrowSize = Math.max(4, radius * 0.22)}
-				{@const arrowY = cy - radius - arrowSize - 1}
+				{@const arrowY = cy - radius - arrowSize + 8}
 				<polygon
+					class="z-100"
 					points="{cx},{arrowY - arrowSize} {cx - arrowSize * 0.7},{arrowY + arrowSize * 0.3} {cx +
 						arrowSize * 0.7},{arrowY + arrowSize * 0.3}"
-					fill="#d94040"
+					fill="#fc1703"
 					stroke="none"
-					opacity="0.85"
+					opacity="100"
 				/>
 			{/if}
 		</g>

@@ -17,18 +17,18 @@
 		class="relative flex h-full w-full flex-col items-center justify-center gap-8 border-2 border-oat bg-white p-8 md:p-16"
 	>
 		<!-- Display headline -->
-		<h1 class="text-center text-5xl font-semibold leading-[1.00] tracking-[-2px] text-black md:text-7xl md:tracking-[-3.2px]">
+		<h1
+			class="text-center text-5xl leading-[1.00] font-semibold tracking-[-2px] text-black md:text-7xl md:tracking-[-3.2px]"
+		>
 			Raywhen
 		</h1>
 
 		<!-- Eyebrow -->
-		<p class="text-center text-lg font-light tracking-tight text-warm-silver">
-			by Jamal Haneef
-		</p>
+		<p class="text-center text-lg font-light tracking-tight text-warm-silver">by Jamal Haneef</p>
 
 		<div class="flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
 			<!-- Primary CTA -->
-			<a
+			<!-- <a
 				href="/generator"
 				class="group inline-flex items-center border-2 border-black bg-black px-6 py-3 text-sm font-semibold tracking-tight text-white shadow-accent transition-all duration-200 ease-out hover:hard-shadow-base active:translate-0 active:shadow-none md:px-8 md:py-3.5"
 			>
@@ -45,7 +45,7 @@
 						d="m14 18l-1.4-1.45L16.15 13H4v-2h12.15L12.6 7.45L14 6l6 6z"
 					/>
 				</svg>
-			</a>
+			</a> -->
 
 			<!-- Secondary CTA -->
 			<a
@@ -60,10 +60,7 @@
 					viewBox="0 0 24 24"
 					class="ml-2 transition-transform duration-150 group-hover:translate-x-1"
 				>
-					<path
-						fill="currentColor"
-						d="m14 18l-1.4-1.45L16.15 13H4v-2h12.15L12.6 7.45L14 6l6 6z"
-					/>
+					<path fill="currentColor" d="m14 18l-1.4-1.45L16.15 13H4v-2h12.15L12.6 7.45L14 6l6 6z" />
 				</svg>
 			</a>
 		</div>

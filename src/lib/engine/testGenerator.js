@@ -1,6 +1,6 @@
 /**
- * Test generation — produces a 15-question test
- * (5 easy, 5 medium, 5 hard) from a numeric seed.
+ * Test generation — produces a 10-question test
+ * (5 medium, 5 hard) from a numeric seed.
  *
  * Uses seeded randomness so the same seed always yields the same test.
  * Supports mixed-symbol rows for medium/hard questions.
@@ -61,9 +61,7 @@ function createMixedGridSeeded(gridSize, selectedRuleIds, rng) {
 	return Array.from({ length: gridSize }, (_, r) => {
 		const shape1 = shuffled[r % shuffled.length];
 		const shape2 = shuffled[(r + 1) % shuffled.length];
-		const finalShape2 = shape2 === shape1
-			? shuffled[(r + 2) % shuffled.length] || 'star'
-			: shape2;
+		const finalShape2 = shape2 === shape1 ? shuffled[(r + 2) % shuffled.length] || 'star' : shape2;
 
 		return Array.from({ length: gridSize }, () => [
 			{
@@ -153,7 +151,6 @@ function createDistractorsSeeded(answer, grid, gridSize, rng) {
 		const d7 = deepClone(answer);
 		d7[0].shape = d7[1].shape;
 		tryPush(d7);
-
 	} else if (answer.length > 0) {
 		const d1 = deepClone(answer);
 		const otherShapes = SHAPE_TYPES.filter((s) => s !== answer[0].shape);
@@ -176,9 +173,7 @@ function createDistractorsSeeded(answer, grid, gridSize, rng) {
 		tryPush(d4);
 
 		const d5 = deepClone(answer);
-		const otherShapes2 = SHAPE_TYPES.filter(
-			(s) => s !== answer[0].shape && s !== d1[0]?.shape
-		);
+		const otherShapes2 = SHAPE_TYPES.filter((s) => s !== answer[0].shape && s !== d1[0]?.shape);
 		if (otherShapes2.length) d5[0].shape = seededChoice(otherShapes2, rng);
 		tryPush(d5);
 	}
@@ -242,9 +237,7 @@ function deduplicateSizeOnlySeeded(allOptions, rng) {
  * We temporarily override Math.random for rules that use it internally.
  */
 function generateMatrixSeeded(gridSize, selectedRuleIds, rng) {
-	const rules = selectedRuleIds
-		.map((id) => ALL_RULES.find((r) => r.id === id))
-		.filter(Boolean);
+	const rules = selectedRuleIds.map((id) => ALL_RULES.find((r) => r.id === id)).filter(Boolean);
 
 	const structural = rules.filter((r) => STRUCTURAL_IDS.has(r.id));
 	const attribute = rules.filter((r) => !STRUCTURAL_IDS.has(r.id));
@@ -328,7 +321,7 @@ function pickRulesSeeded(maxRules, gridSize, rng) {
  */
 
 /**
- * Generate a 15-question test.
+ * Generate a 10-question test.
  * @param {number} seed – numeric seed
  * @returns {{ seed: number, questions: TestQuestion[] }}
  */
@@ -338,11 +331,10 @@ export function generateTest(seed) {
 
 	const questions = [];
 
-	// Generate 5 easy (1 rule), 5 medium (2 rules), 5 hard (3 rules)
+	// Generate 5 medium (2 rules), 5 hard (3 rules)
 	const blocks = [
-		{ difficulty: 'easy', maxRules: 1, count: 5 },
-		{ difficulty: 'medium', maxRules: 2, count: 5 },
-		{ difficulty: 'hard', maxRules: 3, count: 5 }
+		{ difficulty: 'medium', maxRules: 2, count: 7 },
+		{ difficulty: 'hard', maxRules: 3, count: 8 }
 	];
 
 	for (const block of blocks) {
@@ -359,7 +351,7 @@ export function generateTest(seed) {
 		}
 	}
 
-	// Shuffle all 15 questions
+	// Shuffle all 10 questions
 	const shuffled = seededShuffle(questions, rng).map((q, i) => ({
 		...q,
 		number: i + 1

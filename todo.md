@@ -1,5 +1,8 @@
-- Option square size should be the same as matrix cell size
-- Give a toggle to enable/disable grid lines
-- Don't give options where there are two identical options except for size
-- For example, instead of having a circle of size 5, and size 6, both in the top left corner, you can have a circle of size 5 in the top left corner and a circle of size 5 in the bottom right corner
-- Would it be possible to add a toggle to show an up arrow at the top of each base shape to indicate the rotation?
+- Allow skip question and come back (this would involve having a skip button and showing a grid of questions )
+- In /test, reduce three clicks to two clicks (i.e, don't show the right answer. One click to choose, and one click to go next. They are not allowed to answer the same question twice, but if they skipped the question they can come back to it.)
+- Instead of timer going up it should go down
+- Show the grid and rotation arrows even in the modal
+- Change flex-col to flex-row (as in, have the question matrix on the left and have the answer options on the right, with some gap in between)
+- Bring the grid lines and rotation arrows to the right side (in the new layout)
+- Remove easy questions entirely (only for /test)
+- Would it be possible to generate a CSV and display a download button when the test results are shown, that display the test results?
