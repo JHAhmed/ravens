@@ -270,10 +270,12 @@
 </script>
 
 <svelte:head>
-	<title>Test | Raywhen</title>
+	<title>Test | Raywhen - A progressive raven matrix generator</title>
 	<meta
 		name="description"
-		content="Take a timed Raven's Progressive Matrix test with 10 questions across two difficulty levels." />
+		content="Take a timed Raven's Progressive Matrix test with 15 questions across two difficulty levels." />
+	<meta property="og:image" content="{page.url.origin}/ogimage.png" />
+	<meta property="og:url" content="{page.url.origin}/test" />
 </svelte:head>
 
 <EnlargeModal
@@ -301,7 +303,7 @@
 
 			<div class="border-2 border-oat bg-white p-8 md:p-10">
 				<h1 class="mb-1 text-2xl font-semibold tracking-[-0.64px] md:text-3xl">Raywhen Test</h1>
-				<p class="mb-8 text-sm text-warm-silver">10 questions · 15 minutes</p>
+				<p class="mb-8 text-sm text-warm-silver">15 questions · 15 minutes</p>
 
 				<div class="flex flex-col gap-5">
 					<!-- Name -->

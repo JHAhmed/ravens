@@ -351,7 +351,7 @@ export function generateTest(seed) {
 		}
 	}
 
-	// Shuffle all 10 questions
+	// Shuffle all 15 questions
 	const shuffled = seededShuffle(questions, rng).map((q, i) => ({
 		...q,
 		number: i + 1
