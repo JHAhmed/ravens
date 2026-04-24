@@ -4,14 +4,15 @@
 	import EnlargeModal from '$lib/components/EnlargeModal.svelte';
 	import { generateTest } from '$lib/engine/testGenerator.js';
 	import { randomSeed } from '$lib/engine/seededRandom.js';
+	import { dev } from '$app/environment';
 
 	// ── State machine: 'form' → 'test' → 'results' ──────────────────
 	let phase = $state('form');
 
 	// ── Form state ───────────────────────────────────────────────────
-	let name = $state('Jamal');
-	let phone = $state('9345211256');
-	let seed = $state('269608');
+	let name = $state(dev ? 'Jamal' : '');
+	let phone = $state(dev ? '9345211256' : '');
+	let seed = $state(dev ? 666666 : randomSeed());
 	let showSeedInput = $state(false);
 	let customSeedValue = $state('');
 
@@ -358,7 +359,12 @@
 		>
 			<!-- Matrix grid -->
 			<div class="w-full max-w-sm border-2 border-oat bg-white p-4 md:max-w-md md:p-6">
-				<MatrixGrid grid={currentQuestion.matrix.grid} gridSize={3} displayGrid={showGrid} {showRotationArrow} />
+				<MatrixGrid
+					grid={currentQuestion.matrix.grid}
+					gridSize={3}
+					displayGrid={showGrid}
+					{showRotationArrow}
+				/>
 			</div>
 
 			<!-- Answer options -->
@@ -389,7 +395,16 @@
 									disabled:cursor-not-allowed"
 								style="width:120px; height:120px"
 							>
-								<ShapeRenderer elements={opt} size={100} {showRotationArrow} />
+								{#if showGrid}
+									<div class="absolute inset-0 grid h-full w-full grid-cols-3">
+										{#each Array(9) as _}
+											<div class="border border-neutral-200"></div>
+										{/each}
+									</div>
+								{/if}
+								<div class="z-10">
+									<ShapeRenderer elements={opt} size={100} {showRotationArrow} />
+								</div>
 
 								{#if showCorrect}
 									<div

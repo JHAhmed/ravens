@@ -135,6 +135,8 @@
 					options={matrix.options}
 					correctIndex={matrix.correctIndex}
 					cellSize={120}
+					displayGrid={showGrid}
+					{showRotationArrow}
 					onSelect={(i) => {
 						/* could track stats here */
 					}}

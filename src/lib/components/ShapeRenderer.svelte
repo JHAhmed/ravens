@@ -46,54 +46,25 @@
 					stroke-width={sw}
 				/>
 			{:else if el.shape === 'cross'}
-				<path
-					d={crossPath(cx, cy, radius * 2, radius * 0.6)}
-					{fill}
-					{stroke}
-					stroke-width={sw}
-				/>
+				<path d={crossPath(cx, cy, radius * 2, radius * 0.6)} {fill} {stroke} stroke-width={sw} />
 			{:else if el.shape === 'diamond'}
-				<polygon
-					points={polygonPoints(4, cx, cy, radius, 0)}
-					{fill}
-					{stroke}
-					stroke-width={sw}
-				/>
+				<polygon points={polygonPoints(4, cx, cy, radius, 0)} {fill} {stroke} stroke-width={sw} />
 			{:else if el.shape === 'square'}
-				<polygon
-					points={polygonPoints(4, cx, cy, radius, 45)}
-					{fill}
-					{stroke}
-					stroke-width={sw}
-				/>
+				<polygon points={polygonPoints(4, cx, cy, radius, 45)} {fill} {stroke} stroke-width={sw} />
 			{:else if el.shape === 'triangle'}
-				<polygon
-					points={polygonPoints(3, cx, cy, radius)}
-					{fill}
-					{stroke}
-					stroke-width={sw}
-				/>
+				<polygon points={polygonPoints(3, cx, cy, radius)} {fill} {stroke} stroke-width={sw} />
 			{:else if el.shape === 'pentagon'}
-				<polygon
-					points={polygonPoints(5, cx, cy, radius)}
-					{fill}
-					{stroke}
-					stroke-width={sw}
-				/>
+				<polygon points={polygonPoints(5, cx, cy, radius)} {fill} {stroke} stroke-width={sw} />
 			{:else if el.shape === 'hexagon'}
-				<polygon
-					points={polygonPoints(6, cx, cy, radius)}
-					{fill}
-					{stroke}
-					stroke-width={sw}
-				/>
+				<polygon points={polygonPoints(6, cx, cy, radius)} {fill} {stroke} stroke-width={sw} />
 			{/if}
 
-			{#if showRotationArrow && rot !== 0}
+			{#if showRotationArrow}
 				{@const arrowSize = Math.max(4, radius * 0.22)}
-				{@const arrowY = cy - radius - arrowSize - 2}
+				{@const arrowY = cy - radius - arrowSize - 1}
 				<polygon
-					points="{cx},{arrowY - arrowSize} {cx - arrowSize * 0.7},{arrowY + arrowSize * 0.3} {cx + arrowSize * 0.7},{arrowY + arrowSize * 0.3}"
+					points="{cx},{arrowY - arrowSize} {cx - arrowSize * 0.7},{arrowY + arrowSize * 0.3} {cx +
+						arrowSize * 0.7},{arrowY + arrowSize * 0.3}"
 					fill="#d94040"
 					stroke="none"
 					opacity="0.85"

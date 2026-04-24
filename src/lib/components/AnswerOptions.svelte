@@ -1,7 +1,7 @@
 <script>
 	import ShapeRenderer from './ShapeRenderer.svelte';
 
-	let { options = [], correctIndex = -1, onSelect = () => {}, cellSize = 80 } = $props();
+	let { options = [], correctIndex = -1, onSelect = () => {}, cellSize = 80, displayGrid = true, showRotationArrow = false } = $props();
 
 	let selected = $state(-1);
 	let revealed = $state(false);
@@ -46,7 +46,16 @@
 					disabled:cursor-not-allowed"
 				style="width:{cellSize}px; height:{cellSize}px"
 			>
-				<ShapeRenderer elements={opt} size={Math.round(cellSize * 0.75)} />
+				{#if displayGrid}
+					<div class="absolute inset-0 grid h-full w-full grid-cols-3">
+						{#each Array(9) as _}
+							<div class="border border-neutral-200"></div>
+						{/each}
+					</div>
+				{/if}
+				<div class="z-10">
+					<ShapeRenderer elements={opt} size={Math.round(cellSize * 0.75)} {showRotationArrow} />
+				</div>
 
 				{#if revealed && isCorrectOption}
 					<div
