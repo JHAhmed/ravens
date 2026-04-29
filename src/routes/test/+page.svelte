@@ -1,5 +1,6 @@
 <script>
 	import MatrixGrid from '$lib/components/MatrixGrid.svelte';
+	import NumericalMatrixGrid from '$lib/components/NumericalMatrixGrid.svelte';
 	import ShapeRenderer from '$lib/components/ShapeRenderer.svelte';
 	import EnlargeModal from '$lib/components/EnlargeModal.svelte';
 	import { generateTest } from '$lib/engine/testGenerator.js';
@@ -46,6 +47,7 @@
 	const currentQuestion = $derived(test?.questions[currentIndex] ?? null);
 	const totalQuestions = $derived(test?.questions.length ?? 0);
 	const remaining = $derived(Math.max(0, TOTAL_TIME - elapsed));
+	const isNumerical = $derived(currentQuestion?.type === 'numerical');
 
 	const formattedRemaining = $derived(() => {
 		const mins = Math.floor(remaining / 60);
@@ -72,7 +74,8 @@
 		const correct = answered.filter((a) => a.selected === a.correct).length;
 		const byDifficulty = {
 			medium: { total: 0, correct: 0 },
-			hard: { total: 0, correct: 0 }
+			hard: { total: 0, correct: 0 },
+			numerical: { total: 0, correct: 0 }
 		};
 		for (const a of answered) {
 			if (byDifficulty[a.difficulty]) {
@@ -234,20 +237,28 @@
 		lines.push('');
 
 		// Column headers
-		lines.push('Question,Difficulty,Selected Option,Correct Option,Result,Rules');
+		lines.push('Question,Difficulty,Type,Selected Option,Correct Option,Result,Rules/Info');
 
 		// Question rows
 		for (let i = 0; i < totalQuestions; i++) {
 			const q = test.questions[i];
 			const a = answers[i];
-			const selected = a !== null ? a.selected + 1 : '-';
-			const correct = q.matrix.correctIndex + 1;
+			let selected, correct, info;
+			if (q.type === 'numerical') {
+				selected = a !== null ? q.matrix.options[a.selected] : '-';
+				correct = q.matrix.options[q.matrix.correctIndex];
+				const meta = q.numericalMeta;
+				info = `${meta.orientation}: ${meta.coefficients.A}x + ${meta.coefficients.B}y`;
+			} else {
+				selected = a !== null ? a.selected + 1 : '-';
+				correct = q.matrix.correctIndex + 1;
+				info = q.ruleIds.join(' + ');
+			}
 			let result = 'Skipped';
 			if (a !== null) {
 				result = a.selected === a.correct ? 'Correct' : 'Wrong';
 			}
-			const rules = q.ruleIds.join(' + ');
-			lines.push(`${q.number},${q.difficulty},${selected},${correct},${result},"${rules}"`);
+			lines.push(`${q.number},${q.difficulty},${q.type || 'pattern'},${selected},${correct},${result},"${info}"`);
 		}
 
 		const csv = lines.join('\n');
@@ -271,10 +282,10 @@
 </script>
 
 <svelte:head>
-	<title>Test | Raywhen - A progressive raven matrix generator</title>
+	<title>Test | Raywhen - A progressive logical matrix puzzle</title>
 	<meta
 		name="description"
-		content="Take a timed Raven's Progressive Matrix test with 15 questions across two difficulty levels." />
+		content="Take a timed progressive logical matrix puzzle with 15 questions across two difficulty levels." />
 	<meta property="og:image" content="{page.url.origin}/ogimage.png" />
 	<meta property="og:url" content="{page.url.origin}/test" />
 </svelte:head>
@@ -436,11 +447,15 @@
 			<div class="flex shrink-0 flex-col items-center gap-4 md:w-[45%] md:items-start">
 				<!-- Matrix grid -->
 				<div class="w-full max-w-sm border-2 border-oat bg-white p-4 md:max-w-md md:p-6">
-					<MatrixGrid
-						grid={currentQuestion.matrix.grid}
-						gridSize={3}
-						displayGrid={showGrid}
-						{showRotationArrow} />
+					{#if isNumerical}
+						<NumericalMatrixGrid grid={currentQuestion.matrix.grid} gridSize={3} />
+					{:else}
+						<MatrixGrid
+							grid={currentQuestion.matrix.grid}
+							gridSize={3}
+							displayGrid={showGrid}
+							{showRotationArrow} />
+					{/if}
 				</div>
 
 				<!-- Question navigation grid -->
@@ -471,100 +486,131 @@
 
 			<!-- RIGHT: Answer options + toggles + actions -->
 			<div class="flex flex-1 flex-col items-center gap-3 md:items-start">
-				<!-- Display toggles (moved here from header) -->
-				<div class="flex items-center gap-1.5">
-					<button
-						onclick={() => (showGrid = !showGrid)}
-						class="inline-flex cursor-pointer border-2 px-3 py-1 text-xs font-semibold transition-all duration-150
-							{showGrid
-							? 'border-black bg-black text-white'
-							: 'border-oat bg-white text-warm-silver hover:border-black hover:text-black'}">
-						<Icon icon="material-symbols:grid-3x3" class="mr-1 size-4" /> Grid Lines
-					</button>
-					<button
-						onclick={() => (showRotationArrow = !showRotationArrow)}
-						class="inline-flex cursor-pointer border-2 px-3 py-1 text-xs font-semibold transition-all duration-150
-							{showRotationArrow
-							? 'border-black bg-black text-white'
-							: 'border-oat bg-white text-warm-silver hover:border-black hover:text-black'}">
-						<Icon icon="material-symbols-light:arrow-menu-open" class="mr-1 size-4 -rotate-45" /> Rotation
-						Arrow
-					</button>
-				</div>
+				<!-- Display toggles (only for pattern questions) -->
+				{#if !isNumerical}
+					<div class="flex items-center gap-1.5">
+						<button
+							onclick={() => (showGrid = !showGrid)}
+							class="inline-flex cursor-pointer border-2 px-3 py-1 text-xs font-semibold transition-all duration-150
+								{showGrid
+								? 'border-black bg-black text-white'
+								: 'border-oat bg-white text-warm-silver hover:border-black hover:text-black'}">
+							<Icon icon="material-symbols:grid-3x3" class="mr-1 size-4" /> Grid Lines
+						</button>
+						<button
+							onclick={() => (showRotationArrow = !showRotationArrow)}
+							class="inline-flex cursor-pointer border-2 px-3 py-1 text-xs font-semibold transition-all duration-150
+								{showRotationArrow
+								? 'border-black bg-black text-white'
+								: 'border-oat bg-white text-warm-silver hover:border-black hover:text-black'}">
+							<Icon icon="material-symbols-light:arrow-menu-open" class="mr-1 size-4 -rotate-45" /> Rotation
+							Arrow
+						</button>
+					</div>
+				{/if}
 
 				<p class="text-xs font-semibold tracking-[1.08px] text-warm-silver uppercase">
 					{#if answers[currentIndex] !== null}
 						Answer locked
+					{:else if isNumerical}
+						Solve for the missing value
 					{:else}
 						Select the missing piece
 					{/if}
 				</p>
 
 				<!-- Answer options -->
-				<div class="flex flex-wrap justify-center gap-2 md:justify-start md:gap-3">
-					{#each currentQuestion.matrix.options as opt, i}
-						{@const isSelected = i === selectedOption}
-						{@const isLocked = answers[currentIndex] !== null}
-						{@const isLockedSelection = isLocked && answers[currentIndex].selected === i}
+				{#if isNumerical}
+					<!-- Numerical answer buttons -->
+					<div class="flex flex-wrap justify-center gap-2 md:justify-start md:gap-3">
+						{#each currentQuestion.matrix.options as opt, i}
+							{@const isSelected = i === selectedOption}
+							{@const isLocked = answers[currentIndex] !== null}
+							{@const isLockedSelection = isLocked && answers[currentIndex].selected === i}
 
-						<div class="relative">
 							<button
 								onclick={() => selectOption(i)}
 								disabled={isLocked}
-								class="relative flex aspect-square cursor-pointer items-center justify-center border-2 bg-white transition-all duration-200 ease-out
+								class="flex h-16 w-16 cursor-pointer items-center justify-center border-2 bg-white font-mono text-xl font-bold transition-all duration-200 ease-out
 									{isLockedSelection
-									? 'hard-shadow-sm border-black'
+									? 'hard-shadow-sm border-black text-black'
 									: isLocked
-										? 'cursor-not-allowed border-oat opacity-40'
+										? 'cursor-not-allowed border-oat text-warm-silver opacity-40'
 										: isSelected
-											? 'hard-shadow-sm border-black'
-											: 'border-oat hover:hard-shadow-sm hover:border-black'}
-									{isLocked ? 'disabled:cursor-not-allowed' : ''}"
-								style="width:120px; height:120px">
-								{#if showGrid}
-									<div class="absolute inset-0 grid h-full w-full grid-cols-3">
-										{#each Array(9) as _}
-											<div class="border border-neutral-200"></div>
-										{/each}
-									</div>
-								{/if}
-								<div class="z-10">
-									<ShapeRenderer elements={opt} size={100} {showRotationArrow} />
-								</div>
-
-								{#if isLockedSelection}
-									<div
-										class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center bg-black text-white">
-										<svg
-											class="h-3 w-3"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="3">
-											<path d="M5 13l4 4L19 7" />
-										</svg>
-									</div>
-								{/if}
+											? 'hard-shadow-sm border-black text-black'
+											: 'border-oat text-warm-charcoal hover:hard-shadow-sm hover:border-black hover:text-black'}
+									{isLocked ? 'disabled:cursor-not-allowed' : ''}">
+								{opt}
 							</button>
+						{/each}
+					</div>
+				{:else}
+					<!-- Pattern answer options (shape tiles) -->
+					<div class="flex flex-wrap justify-center gap-2 md:justify-start md:gap-3">
+						{#each currentQuestion.matrix.options as opt, i}
+							{@const isSelected = i === selectedOption}
+							{@const isLocked = answers[currentIndex] !== null}
+							{@const isLockedSelection = isLocked && answers[currentIndex].selected === i}
 
-							<!-- Magnifying glass -->
-							<button
-								onclick={() => openEnlarge(opt)}
-								class="absolute -right-1.5 -bottom-1.5 flex h-6 w-6 cursor-pointer items-center justify-center border border-oat bg-white text-warm-silver transition-all hover:scale-110 hover:border-black hover:text-black"
-								aria-label="Enlarge option {i + 1}">
-								<svg
-									class="h-3.5 w-3.5"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2.5">
-									<circle cx="11" cy="11" r="7" />
-									<path d="m21 21l-4.35-4.35" />
-								</svg>
-							</button>
-						</div>
-					{/each}
-				</div>
+							<div class="relative">
+								<button
+									onclick={() => selectOption(i)}
+									disabled={isLocked}
+									class="relative flex aspect-square cursor-pointer items-center justify-center border-2 bg-white transition-all duration-200 ease-out
+										{isLockedSelection
+										? 'hard-shadow-sm border-black'
+										: isLocked
+											? 'cursor-not-allowed border-oat opacity-40'
+											: isSelected
+												? 'hard-shadow-sm border-black'
+												: 'border-oat hover:hard-shadow-sm hover:border-black'}
+										{isLocked ? 'disabled:cursor-not-allowed' : ''}"
+									style="width:120px; height:120px">
+									{#if showGrid}
+										<div class="absolute inset-0 grid h-full w-full grid-cols-3">
+											{#each Array(9) as _}
+												<div class="border border-neutral-200"></div>
+											{/each}
+										</div>
+									{/if}
+									<div class="z-10">
+										<ShapeRenderer elements={opt} size={100} {showRotationArrow} />
+									</div>
+
+									{#if isLockedSelection}
+										<div
+											class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center bg-black text-white">
+											<svg
+												class="h-3 w-3"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="3">
+												<path d="M5 13l4 4L19 7" />
+											</svg>
+										</div>
+									{/if}
+								</button>
+
+								<!-- Magnifying glass -->
+								<button
+									onclick={() => openEnlarge(opt)}
+									class="absolute -right-1.5 -bottom-1.5 flex h-6 w-6 cursor-pointer items-center justify-center border border-oat bg-white text-warm-silver transition-all hover:scale-110 hover:border-black hover:text-black"
+									aria-label="Enlarge option {i + 1}">
+									<svg
+										class="h-3.5 w-3.5"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.5">
+										<circle cx="11" cy="11" r="7" />
+										<path d="m21 21l-4.35-4.35" />
+									</svg>
+								</button>
+							</div>
+						{/each}
+					</div>
+				{/if}
 
 				<!-- Action buttons -->
 				<div class="flex items-center gap-3 pt-2">
@@ -622,8 +668,8 @@
 				</div>
 
 				<!-- Per-difficulty breakdown -->
-				<!-- <div class="mb-6 flex flex-col gap-2">
-					{#each ['medium', 'hard'] as diff}
+				<div class="mb-6 flex flex-col gap-2">
+					{#each ['medium', 'hard', 'numerical'] as diff}
 						{@const d = r.byDifficulty[diff]}
 						<div class="flex items-center justify-between border-2 border-oat bg-cream px-4 py-2.5">
 							<span class="text-xs font-semibold text-dark-charcoal capitalize">
@@ -634,7 +680,7 @@
 							</span>
 						</div>
 					{/each}
-				</div> -->
+				</div>
 
 				<!-- Time -->
 				<div

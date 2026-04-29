@@ -1,6 +1,6 @@
 /**
- * Test generation — produces a 10-question test
- * (5 medium, 5 hard) from a numeric seed.
+ * Test generation — produces a 15-question test
+ * (5 medium, 5 hard, 5 numerical) from a numeric seed.
  *
  * Uses seeded randomness so the same seed always yields the same test.
  * Supports mixed-symbol rows for medium/hard questions.
@@ -9,6 +9,7 @@
 import { ALL_RULES, areRulesCompatible, getElementPositions } from './rules.js';
 import { SHAPE_TYPES, FILL_TYPES, ROTATION_SAFE_SHAPES, SIZE_MAP } from './shapes.js';
 import { createRng, seededShuffle, seededChoice, seededInt } from './seededRandom.js';
+import { generateNumericalMatrix } from './numericalGenerator.js';
 
 // ── Seeded helpers (mirror generator.js helpers but using rng) ───────
 
@@ -314,14 +315,15 @@ function pickRulesSeeded(maxRules, gridSize, rng) {
 
 /**
  * @typedef {Object} TestQuestion
- * @property {number} number        – 1-based question number
- * @property {'easy'|'medium'|'hard'} difficulty
- * @property {object} matrix        – { grid, answer, options, correctIndex }
- * @property {string[]} ruleIds     – rules used for this question
+ * @property {number} number              – 1-based question number
+ * @property {'medium'|'hard'|'numerical'} difficulty
+ * @property {'pattern'|'numerical'}      type – question type
+ * @property {object} matrix              – { grid, options, correctIndex, ... }
+ * @property {string[]} ruleIds           – rules used (pattern questions only)
  */
 
 /**
- * Generate a 10-question test.
+ * Generate a 15-question test.
  * @param {number} seed – numeric seed
  * @returns {{ seed: number, questions: TestQuestion[] }}
  */
@@ -331,24 +333,47 @@ export function generateTest(seed) {
 
 	const questions = [];
 
-	// Generate 5 medium (2 rules), 5 hard (3 rules)
-	const blocks = [
-		{ difficulty: 'medium', maxRules: 2, count: 7 },
-		{ difficulty: 'hard', maxRules: 3, count: 8 }
+	// Generate 5 medium (2 rules), 5 hard (3 rules) pattern questions
+	const patternBlocks = [
+		{ difficulty: 'medium', maxRules: 2, count: 5 },
+		{ difficulty: 'hard', maxRules: 3, count: 5 }
 	];
 
-	for (const block of blocks) {
+	for (const block of patternBlocks) {
 		for (let i = 0; i < block.count; i++) {
 			const ruleIds = pickRulesSeeded(block.maxRules, gridSize, rng);
 			const matrix = generateMatrixSeeded(gridSize, ruleIds, rng);
 
 			questions.push({
 				number: questions.length + 1,
+				type: 'pattern',
 				difficulty: block.difficulty,
 				matrix,
 				ruleIds
 			});
 		}
+	}
+
+	// Generate 5 numerical equation matrix questions
+	for (let i = 0; i < 5; i++) {
+		const numerical = generateNumericalMatrix(rng);
+
+		questions.push({
+			number: questions.length + 1,
+			type: 'numerical',
+			difficulty: 'numerical',
+			matrix: {
+				grid: numerical.grid,
+				options: numerical.options,
+				correctIndex: numerical.correctIndex
+			},
+			ruleIds: [],
+			numericalMeta: {
+				orientation: numerical.orientation,
+				coefficients: numerical.coefficients,
+				correctAnswer: numerical.correctAnswer
+			}
+		});
 	}
 
 	// Shuffle all 15 questions

@@ -58,8 +58,7 @@
 	<title>Generator | Raywhen</title>
 	<meta
 		name="description"
-		content="Generate custom Raven's Progressive Matrices with configurable rules, grid sizes, and difficulty levels."
-	/>
+		content="Generate custom logic matrix puzzle with configurable rules, grid sizes, and difficulty levels." />
 </svelte:head>
 
 <section class="flex min-h-dvh w-full flex-col bg-cream">
@@ -68,14 +67,8 @@
 		<div class="mx-auto flex max-w-7xl items-center justify-between">
 			<a
 				href="/"
-				class="flex items-center gap-2 text-sm font-medium text-warm-silver transition-colors duration-150 hover:text-black"
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="18"
-					height="18"
-					viewBox="0 0 24 24"
-				>
+				class="flex items-center gap-2 text-sm font-medium text-warm-silver transition-colors duration-150 hover:text-black">
+				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
 					<path fill="currentColor" d="m14 18l-6-6l6-6l1.4 1.45L10.85 12l4.55 4.55z" />
 				</svg>
 				Back
@@ -89,8 +82,7 @@
 	<!-- On large screens: 3-col side by side, tries to fit in remaining viewport -->
 	<!-- On small screens / scaled: stacks vertically and scrolls naturally -->
 	<main
-		class="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 px-4 py-4 md:px-8 lg:flex-row lg:gap-6"
-	>
+		class="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 px-4 py-4 md:px-8 lg:flex-row lg:gap-6">
 		<!-- LEFT: Config + Buttons -->
 		<ControlPanel
 			bind:gridSize
@@ -99,8 +91,7 @@
 			onGenerate={generate}
 			onDownload={download}
 			onRandom={randomize}
-			hasMatrix={matrix !== null}
-		/>
+			hasMatrix={matrix !== null} />
 
 		<!-- CENTER: Matrix + Answers -->
 		<div class="flex flex-1 flex-col items-center justify-start gap-3">
@@ -112,8 +103,7 @@
 						class="cursor-pointer border-2 px-3 py-1 text-xs font-semibold transition-all duration-150
 							{showGrid
 							? 'border-black bg-black text-white'
-							: 'border-oat bg-white text-warm-silver hover:border-black hover:text-black'}"
-					>
+							: 'border-oat bg-white text-warm-silver hover:border-black hover:text-black'}">
 						⊞ Grid Lines
 					</button>
 					<button
@@ -121,8 +111,7 @@
 						class="cursor-pointer border-2 px-3 py-1 text-xs font-semibold transition-all duration-150
 							{showRotationArrow
 							? 'border-black bg-black text-white'
-							: 'border-oat bg-white text-warm-silver hover:border-black hover:text-black'}"
-					>
+							: 'border-oat bg-white text-warm-silver hover:border-black hover:text-black'}">
 						↻ Rotation Arrow
 					</button>
 				</div>
@@ -139,20 +128,17 @@
 					{showRotationArrow}
 					onSelect={(i) => {
 						/* could track stats here */
-					}}
-				/>
+					}} />
 			{:else}
 				<!-- Empty state -->
 				<div
-					class="flex aspect-square w-full max-w-sm flex-col items-center justify-center border-2 border-dashed border-oat bg-white p-8"
-				>
+					class="flex aspect-square w-full max-w-sm flex-col items-center justify-center border-2 border-dashed border-oat bg-white p-8">
 					<svg
 						class="mb-4 h-12 w-12 text-oat"
 						viewBox="0 0 24 24"
 						fill="none"
 						stroke="currentColor"
-						stroke-width="1.5"
-					>
+						stroke-width="1.5">
 						<rect x="3" y="3" width="7" height="7" rx="0" />
 						<rect x="14" y="3" width="7" height="7" rx="0" />
 						<rect x="3" y="14" width="7" height="7" rx="0" />
