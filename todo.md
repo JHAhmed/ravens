@@ -1,8 +1,20 @@
-- Allow skip question and come back (this would involve having a skip button and showing a grid of questions )
-- In /test, reduce three clicks to two clicks (i.e, don't show the right answer. One click to choose, and one click to go next. They are not allowed to answer the same question twice, but if they skipped the question they can come back to it.)
-- Instead of timer going up it should go down
-- Show the grid and rotation arrows even in the modal
-- Change flex-col to flex-row (as in, have the question matrix on the left and have the answer options on the right, with some gap in between)
-- Bring the grid lines and rotation arrows to the right side (in the new layout)
-- Remove easy questions entirely (only for /test)
-- Would it be possible to generate a CSV and display a download button when the test results are shown, that display the test results?
+<!-- IMPORTANT -->
+
+- Do NOT uncomment anything I've commented out. If I've done it, it's for a reason.
+
+<!-- FIXES -->
+
+- Apparently sometimes in the numerical questions, there are situations like, "This could be 3A + B or A + 3B, so the answer could be 21 or 31." The
+  particular example I got was this:
+  - 1x + 1y = 4
+  - 4x + 4y = 16
+- This is what the feedback was, "We could maybe limit solutions to just rows, not both rows and columns. Say we go with rows as in the problem. Then we make sure that the coeffiecients in Row 1 and Row 2 don't scale by the same factor. Meaning x1/y1 should not be equal to x2/y2. Also, x1/x2 should not be equal to y1/y2, else they would reduce to the same equation and will become unsolvable."
+
+<!-- IDEAS -->
+
+- Before the first question is attemped (right after the test begins), can we have a popup explaining the rules?
+- Also include helpful comments like informing the user that they can toggle the grid lines and rotational arrows
+  - Also that they can enlarge the options by clicking on the magnifying glass at the bottom right of each option
+  - Also that they can skip questions and return to them later, but once they lock in an answer it can't be changed
+  - Also that they have to finish it in under 15 minutes, if not it gets submitted automatically with ONLY the answers they have confirmed
+  - Add the general rules

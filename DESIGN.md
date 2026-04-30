@@ -269,6 +269,7 @@ What makes Clay truly distinctive is its hover micro-animations: buttons on hove
 
 ### Don't
 
+- Do NOT uncomment anything I've commented out. If I've done it, it's for a reason.
 - Don't use cool gray backgrounds — the warm cream (`#faf9f7`) is non-negotiable
 - Don't use neutral gray borders (`#ccc`, `#ddd`) — always use the warm oat tones
 - Don't mix more than 2 swatch colors in the same section

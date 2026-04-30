@@ -3,6 +3,7 @@
 	import NumericalMatrixGrid from '$lib/components/NumericalMatrixGrid.svelte';
 	import ShapeRenderer from '$lib/components/ShapeRenderer.svelte';
 	import EnlargeModal from '$lib/components/EnlargeModal.svelte';
+	import TestRulesPopup from '$lib/components/TestRulesPopup.svelte';
 	import { generateTest } from '$lib/engine/testGenerator.js';
 	import { randomSeed } from '$lib/engine/seededRandom.js';
 	import { dev } from '$app/environment';
@@ -42,6 +43,7 @@
 	// ── Display toggles ──────────────────────────────────────────────
 	let showGrid = $state(true);
 	let showRotationArrow = $state(true);
+	let showRulesPopup = $state(false);
 
 	// ── Derived ──────────────────────────────────────────────────────
 	const currentQuestion = $derived(test?.questions[currentIndex] ?? null);
@@ -98,6 +100,7 @@
 		startTime = Date.now();
 		elapsed = 0;
 		phase = 'test';
+		showRulesPopup = true;
 
 		timerInterval = setInterval(() => {
 			elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -258,7 +261,9 @@
 			if (a !== null) {
 				result = a.selected === a.correct ? 'Correct' : 'Wrong';
 			}
-			lines.push(`${q.number},${q.difficulty},${q.type || 'pattern'},${selected},${correct},${result},"${info}"`);
+			lines.push(
+				`${q.number},${q.difficulty},${q.type || 'pattern'},${selected},${correct},${result},"${info}"`
+			);
 		}
 
 		const csv = lines.join('\n');
@@ -296,6 +301,8 @@
 	onClose={() => (enlargeOpen = false)}
 	{showGrid}
 	{showRotationArrow} />
+
+<TestRulesPopup open={showRulesPopup} onDismiss={() => (showRulesPopup = false)} />
 
 <!-- ═══════════════════════════════════════════════════════════════════ -->
 <!-- PHASE: FORM                                                        -->
@@ -668,7 +675,7 @@
 				</div>
 
 				<!-- Per-difficulty breakdown -->
-				<div class="mb-6 flex flex-col gap-2">
+				<!-- <div class="mb-6 flex flex-col gap-2">
 					{#each ['medium', 'hard', 'numerical'] as diff}
 						{@const d = r.byDifficulty[diff]}
 						<div class="flex items-center justify-between border-2 border-oat bg-cream px-4 py-2.5">
@@ -680,7 +687,7 @@
 							</span>
 						</div>
 					{/each}
-				</div>
+				</div> -->
 
 				<!-- Time -->
 				<div

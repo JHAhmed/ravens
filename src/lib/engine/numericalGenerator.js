@@ -1,14 +1,34 @@
 /**
  * Numerical equation matrix generator.
  *
- * Produces 3×3 grids where each row (or column) follows
+ * Produces 3×3 grids where each row follows
  * the linear equation  A·x + B·y = C.
  *
  * To keep puzzles accessible, one of A or B is always 1.
  * The missing cell is always grid[2][2].
+ *
+ * Independence constraint: the first two rows' (x, y) pairs
+ * must be linearly independent so the equation is uniquely
+ * solvable from the grid (prevents "could be 3A+B or A+3B").
  */
 
 import { seededShuffle, seededInt, seededChoice } from './seededRandom.js';
+
+/**
+ * Check that two (x, y) pairs are linearly independent.
+ * Two vectors (x1,y1) and (x2,y2) are proportional iff x1*y2 === x2*y1.
+ * We also check that (x1,x2) is not proportional to (y1,y2) —
+ * i.e. x1*y2 !== x2*y1  AND  x1/x2 !== y1/y2  ⟺  x1*y2 !== y1*x2
+ * (same cross-multiply). So really we just need the one check,
+ * but we also ensure x1 !== x2 || y1 !== y2 to avoid identical rows.
+ */
+function areIndependent(x1, y1, x2, y2) {
+	// Same row values → not independent
+	if (x1 === x2 && y1 === y2) return false;
+	// Proportional rows → not independent (cross-multiply avoids division)
+	if (x1 * y2 === x2 * y1) return false;
+	return true;
+}
 
 /**
  * Generate a single numerical matrix question.
@@ -19,13 +39,12 @@ import { seededShuffle, seededInt, seededChoice } from './seededRandom.js';
  *   correctAnswer: number,
  *   options: number[],
  *   correctIndex: number,
- *   orientation: 'row'|'column',
+ *   orientation: 'row',
  *   coefficients: { A: number, B: number }
  * }}
  */
 export function generateNumericalMatrix(rng) {
-	// Pick orientation: row-wise or column-wise
-	const orientation = rng() < 0.5 ? 'row' : 'column';
+	const orientation = 'row';
 
 	// Pick coefficients — one is always 1, the other in [2, 5]
 	let A, B;
@@ -37,43 +56,38 @@ export function generateNumericalMatrix(rng) {
 		B = 1;
 	}
 
-	let grid;
+	// Each row: A * col0 + B * col1 = col2
+	// Generate 3 rows of (x, y) values with independence constraint
+	const rows = [];
+	const MAX_ATTEMPTS = 50;
 
-	if (orientation === 'row') {
-		// Each row: A * col0 + B * col1 = col2
-		// Generate 3 rows of (x, y) values
-		const rows = [];
-		for (let r = 0; r < 3; r++) {
-			const x = seededInt(1, 9, rng);
-			const y = seededInt(1, 9, rng);
-			const c = A * x + B * y;
-			rows.push([x, y, c]);
-		}
-		grid = rows;
-	} else {
-		// Each column: A * row0 + B * row1 = row2
-		// Generate 3 columns of (v1, v2) values
-		const col0v1 = seededInt(1, 9, rng);
-		const col0v2 = seededInt(1, 9, rng);
-		const col1v1 = seededInt(1, 9, rng);
-		const col1v2 = seededInt(1, 9, rng);
-		const col2v1 = seededInt(1, 9, rng);
-		const col2v2 = seededInt(1, 9, rng);
+	for (let r = 0; r < 3; r++) {
+		let x, y;
+		let attempts = 0;
 
-		grid = [
-			[col0v1, col1v1, col2v1],
-			[col0v2, col1v2, col2v2],
-			[A * col0v1 + B * col0v2, A * col1v1 + B * col1v2, A * col2v1 + B * col2v2]
-		];
+		do {
+			x = seededInt(1, 9, rng);
+			y = seededInt(1, 9, rng);
+			attempts++;
+
+			// For row 0, any values are fine.
+			// For rows 1+, ensure independence against row 0.
+			if (r === 0) break;
+			if (areIndependent(rows[0][0], rows[0][1], x, y)) break;
+		} while (attempts < MAX_ATTEMPTS);
+
+		const c = A * x + B * y;
+		rows.push([x, y, c]);
 	}
 
+	const grid = rows;
 	const correctAnswer = grid[2][2];
 
 	// Null out the missing cell
 	grid[2][2] = null;
 
 	// Generate distractors
-	const distractors = generateDistractors(correctAnswer, A, B, grid, orientation, rng);
+	const distractors = generateDistractors(correctAnswer, A, B, grid, rng);
 
 	// Combine and shuffle
 	const allOptions = [correctAnswer, ...distractors];
@@ -94,7 +108,7 @@ export function generateNumericalMatrix(rng) {
 /**
  * Generate 5 plausible distractor values.
  */
-function generateDistractors(correct, A, B, grid, orientation, rng) {
+function generateDistractors(correct, A, B, grid, rng) {
 	const distractors = new Set();
 
 	// Type 1: Off-by-one
@@ -102,38 +116,18 @@ function generateDistractors(correct, A, B, grid, orientation, rng) {
 	distractors.add(correct - 1);
 
 	// Type 2: Swapped coefficients — apply B to first input, A to second
-	if (orientation === 'row') {
-		// Row 2: B * col0 + A * col1 instead of A * col0 + B * col1
-		const x = grid[2][0];
-		const y = grid[2][1];
-		distractors.add(B * x + A * y);
-	} else {
-		// Column 2: B * row0 + A * row1 instead of A * row0 + B * row1
-		const v1 = grid[0][2];
-		const v2 = grid[1][2];
-		distractors.add(B * v1 + A * v2);
-	}
+	const x = grid[2][0];
+	const y = grid[2][1];
+	distractors.add(B * x + A * y);
 
 	// Type 3: Only multiply by A (ignore B)
-	if (orientation === 'row') {
-		distractors.add(A * grid[2][0] + grid[2][1]);
-	} else {
-		distractors.add(A * grid[0][2] + grid[1][2]);
-	}
+	distractors.add(A * grid[2][0] + grid[2][1]);
 
 	// Type 4: Only multiply by B (ignore A)
-	if (orientation === 'row') {
-		distractors.add(grid[2][0] + B * grid[2][1]);
-	} else {
-		distractors.add(grid[0][2] + B * grid[1][2]);
-	}
+	distractors.add(grid[2][0] + B * grid[2][1]);
 
 	// Type 5: Simple sum of the two inputs
-	if (orientation === 'row') {
-		distractors.add(grid[2][0] + grid[2][1]);
-	} else {
-		distractors.add(grid[0][2] + grid[1][2]);
-	}
+	distractors.add(grid[2][0] + grid[2][1]);
 
 	// Type 6: Off by the coefficient
 	distractors.add(correct + A);

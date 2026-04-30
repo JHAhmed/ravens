@@ -21,7 +21,13 @@
 		</h1>
 
 		<!-- Eyebrow -->
-		<p class="text-center text-lg font-light tracking-tight text-warm-silver">by Jamal Haneef</p>
+		<p class="text-center text-lg font-light tracking-tight text-warm-silver">
+			by <a
+				href="https://www.wurks.studio/"
+				target="_blank"
+				class="font-medium text-[#5809fc] decoration-2 underline-offset-2 hover:underline"
+				>Wurks Studio</a>
+		</p>
 
 		<div class="flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
 			<!-- Primary CTA -->

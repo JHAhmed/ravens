@@ -24,4 +24,4 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div>{@render children()}</div>
+<div class="selection:bg-oat selection:text-black">{@render children()}</div>

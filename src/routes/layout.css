@@ -44,10 +44,10 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 }
 
-::selection {
+/* ::selection {
 	background-color: rgba(0, 0, 0, 0.12);
 	color: #000000;
-}
+} */
 
 /* ── Scrollbar (warm) ──────────────────────────────────────────── */
 ::-webkit-scrollbar {
