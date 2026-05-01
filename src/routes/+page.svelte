@@ -3,10 +3,10 @@
 </script>
 
 <svelte:head>
-	<title>Raywhen | A logical matrix puzzle generator</title>
+	<title>Raywhen | A logical matrix puzzle test</title>
 	<meta
 		name="description"
-		content="Raywhen is a logical matrix puzzle generator. It generates raven matrices based on the rules selected by the user." />
+		content="Raywhen is a logical matrix puzzle test. It tests the user's ability to identify patterns in logical matrices." />
 	<meta property="og:image" content="{page.url.origin}/ogimage.png" />
 	<meta property="og:url" content="{page.url.origin}/" />
 </svelte:head>
@@ -35,7 +35,7 @@
 				href="/generator"
 				class="group inline-flex items-center border-2 border-black bg-black px-6 py-3 text-sm font-semibold tracking-tight text-white shadow-accent transition-all duration-200 ease-out hover:hard-shadow-base active:translate-0 active:shadow-none md:px-8 md:py-3.5"
 			>
-				Ravenizer
+				Generator
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="20"

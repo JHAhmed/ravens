@@ -16,10 +16,10 @@
 	srcURL="https://cloud.umami.is/script.js" />
 
 <svelte:head>
-	<title>Raywhen | A logical matrix puzzle generator</title>
+	<title>Raywhen | A logical matrix puzzle test</title>
 	<meta
 		name="description"
-		content="Raywhen is a logical matrix puzzle generator. It generates raven matrices based on the rules selected by the user." />
+		content="Raywhen is a logical matrix puzzle test. It tests the user's ability to identify patterns in logical matrices." />
 
 	<link rel="icon" href={favicon} />
 </svelte:head>
