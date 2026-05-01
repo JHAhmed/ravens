@@ -14,9 +14,9 @@
 					? 'border-dashed border-warm-silver bg-cream'
 					: 'border-oat bg-white'}">
 				{#if isMissing}
-					<span class="text-3xl font-bold text-warm-silver md:text-4xl">?</span>
+					<span class="text-2xl font-bold text-warm-silver md:text-3xl md:text-4xl">?</span>
 				{:else}
-					<span class="font-mono text-2xl font-bold text-black md:text-3xl">{cell}</span>
+					<span class="font-mono text-xl font-bold text-black md:text-2xl md:text-3xl">{cell}</span>
 				{/if}
 			</div>
 		{/each}

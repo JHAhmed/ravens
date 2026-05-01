@@ -305,7 +305,7 @@
 <TestRulesPopup open={showRulesPopup} onDismiss={() => (showRulesPopup = false)} />
 
 <!-- ═══════════════════════════════════════════════════════════════════ -->
-<!-- PHASE: FORM                                                        -->
+<!-- PHASE: FORM                                                         -->
 <!-- ═══════════════════════════════════════════════════════════════════ -->
 {#if phase === 'form'}
 	<section class="flex h-dvh w-full items-center justify-center bg-cream p-6">
@@ -449,11 +449,11 @@
 
 		<!-- Question body — flex-row layout -->
 		<main
-			class="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-4 py-4 md:flex-row md:gap-8 md:px-8 md:py-6">
+			class="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center gap-4 overflow-y-auto px-4 py-4 md:flex-row md:items-start md:gap-8 md:px-8 md:py-6">
 			<!-- LEFT: Matrix grid + Question navigation grid -->
-			<div class="flex shrink-0 flex-col items-center gap-4 md:w-[45%] md:items-start">
+			<div class="flex w-full shrink-0 flex-col items-center gap-3 md:w-[45%] md:items-start">
 				<!-- Matrix grid -->
-				<div class="w-full max-w-sm border-2 border-oat bg-white p-4 md:max-w-md md:p-6">
+				<div class="w-full max-w-[280px] border-2 border-oat bg-white p-3 sm:max-w-sm sm:p-4 md:max-w-md md:p-6">
 					{#if isNumerical}
 						<NumericalMatrixGrid grid={currentQuestion.matrix.grid} gridSize={3} />
 					{:else}
@@ -466,24 +466,24 @@
 				</div>
 
 				<!-- Question navigation grid -->
-				<div class="w-full max-w-sm md:max-w-md">
-					<p class="mb-2 text-[11px] font-semibold tracking-[1.08px] text-warm-silver uppercase">
+				<div class="w-full max-w-[280px] sm:max-w-sm md:max-w-md">
+					<p class="mb-1.5 text-[11px] font-semibold tracking-[1.08px] text-warm-silver uppercase">
 						Questions
 					</p>
-					<div class="grid grid-cols-5 gap-1.5 md:grid-cols-10">
+					<div class="grid grid-cols-5 gap-1 sm:gap-1.5 md:grid-cols-10">
 						{#each Array(totalQuestions) as _, i}
 							{@const status = getQuestionStatus(i)}
 							{@const isCurrent = i === currentIndex}
 							<button
-								onclick={() => goToQuestion(i)}
-								class="flex aspect-square cursor-pointer items-center justify-center border-2 text-xs font-bold transition-all duration-150
-									{isCurrent
-									? 'border-black bg-black text-white'
-									: status === 'answered'
-										? 'border-oat bg-dark-charcoal text-white'
-										: status === 'skipped'
-											? 'border-warn bg-wrong-light text-wrong'
-											: 'border-oat bg-white text-warm-silver hover:border-black hover:text-black'}">
+							onclick={() => goToQuestion(i)}
+							class="flex aspect-square cursor-pointer items-center justify-center border-2 text-[10px] font-bold transition-all duration-150 sm:text-xs
+								{isCurrent
+								? 'border-black bg-black text-white'
+								: status === 'answered'
+									? 'border-oat bg-dark-charcoal text-white'
+									: status === 'skipped'
+										? 'border-warn bg-wrong-light text-wrong'
+										: 'border-oat bg-white text-warm-silver hover:border-black hover:text-black'}">
 								{i + 1}
 							</button>
 						{/each}
@@ -492,7 +492,7 @@
 			</div>
 
 			<!-- RIGHT: Answer options + toggles + actions -->
-			<div class="flex flex-1 flex-col items-center gap-3 md:items-start">
+			<div class="flex w-full flex-1 flex-col items-center gap-3 md:items-start">
 				<!-- Display toggles (only for pattern questions) -->
 				{#if !isNumerical}
 					<div class="flex items-center gap-1.5">
@@ -536,17 +536,17 @@
 							{@const isLockedSelection = isLocked && answers[currentIndex].selected === i}
 
 							<button
-								onclick={() => selectOption(i)}
-								disabled={isLocked}
-								class="flex h-16 w-16 cursor-pointer items-center justify-center border-2 bg-white font-mono text-xl font-bold transition-all duration-200 ease-out
-									{isLockedSelection
-									? 'hard-shadow-sm border-black text-black'
-									: isLocked
-										? 'cursor-not-allowed border-oat text-warm-silver opacity-40'
-										: isSelected
-											? 'hard-shadow-sm border-black text-black'
-											: 'border-oat text-warm-charcoal hover:hard-shadow-sm hover:border-black hover:text-black'}
-									{isLocked ? 'disabled:cursor-not-allowed' : ''}">
+							onclick={() => selectOption(i)}
+							disabled={isLocked}
+							class="flex h-14 w-14 cursor-pointer items-center justify-center border-2 bg-white font-mono text-lg font-bold transition-all duration-200 ease-out sm:h-16 sm:w-16 sm:text-xl
+								{isLockedSelection
+								? 'hard-shadow-sm border-black text-black'
+								: isLocked
+									? 'cursor-not-allowed border-oat text-warm-silver opacity-40'
+									: isSelected
+										? 'hard-shadow-sm border-black text-black'
+										: 'border-oat text-warm-charcoal hover:hard-shadow-sm hover:border-black hover:text-black'}
+								{isLocked ? 'disabled:cursor-not-allowed' : ''}">
 								{opt}
 							</button>
 						{/each}
@@ -560,19 +560,19 @@
 							{@const isLockedSelection = isLocked && answers[currentIndex].selected === i}
 
 							<div class="relative">
-								<button
-									onclick={() => selectOption(i)}
-									disabled={isLocked}
-									class="relative flex aspect-square cursor-pointer items-center justify-center border-2 bg-white transition-all duration-200 ease-out
-										{isLockedSelection
-										? 'hard-shadow-sm border-black'
-										: isLocked
-											? 'cursor-not-allowed border-oat opacity-40'
-											: isSelected
-												? 'hard-shadow-sm border-black'
-												: 'border-oat hover:hard-shadow-sm hover:border-black'}
-										{isLocked ? 'disabled:cursor-not-allowed' : ''}"
-									style="width:120px; height:120px">
+							<button
+								onclick={() => selectOption(i)}
+								disabled={isLocked}
+								class="relative flex aspect-square cursor-pointer items-center justify-center border-2 bg-white transition-all duration-200 ease-out
+									{isLockedSelection
+									? 'hard-shadow-sm border-black'
+									: isLocked
+										? 'cursor-not-allowed border-oat opacity-40'
+										: isSelected
+											? 'hard-shadow-sm border-black'
+											: 'border-oat hover:hard-shadow-sm hover:border-black'}
+									{isLocked ? 'disabled:cursor-not-allowed' : ''}"
+								style="width: clamp(80px, 22vw, 120px); height: clamp(80px, 22vw, 120px)">
 									{#if showGrid}
 										<div class="absolute inset-0 grid h-full w-full grid-cols-3">
 											{#each Array(9) as _}
@@ -581,7 +581,7 @@
 										</div>
 									{/if}
 									<div class="z-10">
-										<ShapeRenderer elements={opt} size={100} {showRotationArrow} />
+									<ShapeRenderer elements={opt} size={80} {showRotationArrow} />
 									</div>
 
 									{#if isLockedSelection}
@@ -620,26 +620,26 @@
 				{/if}
 
 				<!-- Action buttons -->
-				<div class="flex items-center gap-3 pt-2">
+				<div class="flex w-full items-center gap-2 pt-2 sm:w-auto sm:gap-3">
 					{#if answers[currentIndex] === null}
 						<!-- Not yet answered -->
 						<button
 							onclick={confirmAnswer}
 							disabled={selectedOption === -1}
-							class="border-2 border-black bg-black px-6 py-2.5 text-sm font-semibold text-white shadow-accent transition-all duration-200 ease-out hover:hard-shadow-base active:translate-0 active:shadow-none disabled:pointer-events-none disabled:opacity-35
+							class="flex-1 border-2 border-black bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-accent transition-all duration-200 ease-out hover:hard-shadow-base active:translate-0 active:shadow-none disabled:pointer-events-none disabled:opacity-35 sm:flex-none sm:px-6
 								{selectedOption === -1 ? '' : 'cursor-pointer'}">
 							Confirm & Next
 						</button>
 						<button
 							onclick={skipQuestion}
-							class="cursor-pointer border-2 border-oat bg-white px-5 py-2.5 text-sm font-semibold text-warm-silver transition-all duration-150 hover:border-black hover:text-black">
+							class="cursor-pointer border-2 border-oat bg-white px-4 py-2.5 text-sm font-semibold text-warm-silver transition-all duration-150 hover:border-black hover:text-black sm:px-5">
 							Skip
 						</button>
 					{:else}
 						<!-- Already answered — let them move on -->
 						<button
 							onclick={advanceToNext}
-							class="cursor-pointer border-2 border-black bg-black px-6 py-2.5 text-sm font-semibold text-white shadow-accent transition-all duration-200 ease-out hover:hard-shadow-base active:translate-0 active:shadow-none">
+							class="w-full cursor-pointer border-2 border-black bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-accent transition-all duration-200 ease-out hover:hard-shadow-base active:translate-0 active:shadow-none sm:w-auto sm:px-6">
 							{allAnswered ? 'View Results →' : 'Next Question →'}
 						</button>
 					{/if}
